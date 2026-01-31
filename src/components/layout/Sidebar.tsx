@@ -69,7 +69,7 @@ export function Sidebar() {
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {menuItems.map((item) => {
           const isActive = location.pathname === item.path;
-          const Icon = item.icon === Horse ? HorseIcon : item.icon;
+          const Icon = item.icon;
 
           return (
             <Link
