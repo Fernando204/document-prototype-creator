@@ -10,7 +10,6 @@ interface HorseCardProps {
   status: "saudável" | "em tratamento" | "observação";
   imageUrl?: string;
   nextEvent?: string;
-  owner?: string;
 }
 
 const statusConfig = {
@@ -35,7 +34,6 @@ export function HorseCard({
   status,
   imageUrl,
   nextEvent,
-  owner,
 }: HorseCardProps) {
   const config = statusConfig[status];
 
@@ -90,11 +88,6 @@ export function HorseCard({
           </p>
         </div>
 
-        {owner && (
-          <p className="text-xs text-muted-foreground">
-            Proprietário: <span className="font-medium">{owner}</span>
-          </p>
-        )}
 
         {nextEvent && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2">

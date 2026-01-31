@@ -4,7 +4,7 @@ import { HorseCard } from "@/components/dashboard/HorseCard";
 import { UpcomingEvents } from "@/components/dashboard/UpcomingEvents";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { QuickActions } from "@/components/dashboard/QuickActions";
-import { Heart, Users, Calendar, TrendingUp } from "lucide-react";
+import { Heart, Calendar, TrendingUp } from "lucide-react";
 import horse1 from "@/assets/horse-1.jpg";
 import horse2 from "@/assets/horse-2.jpg";
 
@@ -31,7 +31,6 @@ const mockHorses = [
     age: "5 anos",
     status: "saudável" as const,
     nextEvent: "Vacina - 05/02",
-    owner: "João Silva",
     imageUrl: horse1,
   },
   {
@@ -40,7 +39,6 @@ const mockHorses = [
     age: "3 anos",
     status: "em tratamento" as const,
     nextEvent: "Ferrageamento - Amanhã",
-    owner: "Maria Santos",
     imageUrl: horse2,
   },
   {
@@ -49,7 +47,6 @@ const mockHorses = [
     age: "7 anos",
     status: "saudável" as const,
     nextEvent: "Check-up - 10/02",
-    owner: "Carlos Oliveira",
   },
   {
     name: "Luna",
@@ -57,7 +54,6 @@ const mockHorses = [
     age: "4 anos",
     status: "observação" as const,
     nextEvent: "Vermifugação - 08/02",
-    owner: "Ana Costa",
   },
 ];
 
@@ -68,42 +64,39 @@ const Index = () => {
         {/* Welcome Header */}
         <div className="animate-fade-in">
           <h1 className="text-2xl font-bold text-foreground">
-            Bom dia, Administrador 👋
+            Bom dia! 👋
           </h1>
           <p className="text-muted-foreground mt-1">
-            Aqui está um resumo do seu haras hoje.
+            Aqui está o resumo dos seus cavalos hoje.
           </p>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
-            title="Total de Cavalos"
-            value={42}
-            subtitle="4 novos este mês"
+            title="Meus Cavalos"
+            value={4}
+            subtitle="Todos sob seu cuidado"
             icon={<HorseIcon className="h-5 w-5" />}
-            trend={{ value: 12, isPositive: true }}
             variant="primary"
           />
           <StatCard
-            title="Saúde em Dia"
-            value="95%"
-            subtitle="40 de 42 cavalos"
-            icon={<Heart className="h-5 w-5" />}
-            trend={{ value: 5, isPositive: true }}
-          />
-          <StatCard
-            title="Clientes Ativos"
-            value={28}
-            subtitle="3 novos este mês"
-            icon={<Users className="h-5 w-5" />}
-            trend={{ value: 8, isPositive: true }}
-          />
-          <StatCard
-            title="Eventos esta Semana"
-            value={12}
-            subtitle="5 vacinas, 4 check-ups"
+            title="Eventos Próximos"
+            value={5}
+            subtitle="2 vacinas, 2 check-ups"
             icon={<Calendar className="h-5 w-5" />}
+          />
+          <StatCard
+            title="Competições"
+            value={2}
+            subtitle="Próximas 30 dias"
+            icon={<TrendingUp className="h-5 w-5" />}
+          />
+          <StatCard
+            title="Estoque Baixo"
+            value={3}
+            subtitle="Itens a repor"
+            icon={<Heart className="h-5 w-5" />}
           />
         </div>
 
