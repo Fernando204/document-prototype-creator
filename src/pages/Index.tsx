@@ -4,7 +4,7 @@ import { HorseCard } from "@/components/dashboard/HorseCard";
 import { UpcomingEvents } from "@/components/dashboard/UpcomingEvents";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { QuickActions } from "@/components/dashboard/QuickActions";
-import { Heart, Users, Calendar, TrendingUp } from "lucide-react";
+import { Heart, Calendar, TrendingUp } from "lucide-react";
 import horse1 from "@/assets/horse-1.jpg";
 import horse2 from "@/assets/horse-2.jpg";
 
