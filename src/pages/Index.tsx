@@ -31,7 +31,6 @@ const mockHorses = [
     age: "5 anos",
     status: "saudável" as const,
     nextEvent: "Vacina - 05/02",
-    owner: "João Silva",
     imageUrl: horse1,
   },
   {
@@ -40,7 +39,6 @@ const mockHorses = [
     age: "3 anos",
     status: "em tratamento" as const,
     nextEvent: "Ferrageamento - Amanhã",
-    owner: "Maria Santos",
     imageUrl: horse2,
   },
   {
@@ -49,7 +47,6 @@ const mockHorses = [
     age: "7 anos",
     status: "saudável" as const,
     nextEvent: "Check-up - 10/02",
-    owner: "Carlos Oliveira",
   },
   {
     name: "Luna",
@@ -57,7 +54,6 @@ const mockHorses = [
     age: "4 anos",
     status: "observação" as const,
     nextEvent: "Vermifugação - 08/02",
-    owner: "Ana Costa",
   },
 ];
 

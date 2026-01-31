@@ -88,11 +88,6 @@ export function HorseCard({
           </p>
         </div>
 
-        {owner && (
-          <p className="text-xs text-muted-foreground">
-            Proprietário: <span className="font-medium">{owner}</span>
-          </p>
-        )}
 
         {nextEvent && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2">
