@@ -4,7 +4,9 @@ import {
   LayoutDashboard,
   Heart,
   Calendar,
-  Users,
+  Package,
+  Trophy,
+  Baby,
   Wallet,
   Settings,
   ChevronLeft,
@@ -34,7 +36,9 @@ const menuItems = [
   { icon: HorseIcon, label: "Cavalos", path: "/cavalos" },
   { icon: Heart, label: "Saúde", path: "/saude" },
   { icon: Calendar, label: "Agenda", path: "/agenda" },
-  { icon: Users, label: "Clientes", path: "/clientes" },
+  { icon: Package, label: "Estoque", path: "/estoque" },
+  { icon: Trophy, label: "Competição", path: "/competicao" },
+  { icon: Baby, label: "Reprodução", path: "/reproducao" },
   { icon: Wallet, label: "Financeiro", path: "/financeiro" },
 ];
 
