@@ -10,7 +10,6 @@ interface HorseCardProps {
   status: "saudável" | "em tratamento" | "observação";
   imageUrl?: string;
   nextEvent?: string;
-  owner?: string;
 }
 
 const statusConfig = {
