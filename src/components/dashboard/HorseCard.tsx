@@ -34,7 +34,6 @@ export function HorseCard({
   status,
   imageUrl,
   nextEvent,
-  owner,
 }: HorseCardProps) {
   const config = statusConfig[status];
 
