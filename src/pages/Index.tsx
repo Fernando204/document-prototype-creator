@@ -32,6 +32,7 @@ const mockHorses = [
     status: "saudável" as const,
     nextEvent: "Vacina - 05/02",
     owner: "João Silva",
+    imageUrl: horse1,
   },
   {
     name: "Estrela",
@@ -40,6 +41,7 @@ const mockHorses = [
     status: "em tratamento" as const,
     nextEvent: "Ferrageamento - Amanhã",
     owner: "Maria Santos",
+    imageUrl: horse2,
   },
   {
     name: "Thor",
