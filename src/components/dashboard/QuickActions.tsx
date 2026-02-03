@@ -1,34 +1,67 @@
 import { Plus, Syringe, Calendar, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+interface QuickActionsProps {
+  onNewHorse?: () => void;
+  onNewVaccine?: () => void;
+  onNewEvent?: () => void;
+  onReport?: () => void;
+}
+
 const actions = [
   {
     icon: Plus,
     label: "Novo Cavalo",
     description: "Cadastrar animal",
     variant: "default" as const,
+    action: "newHorse",
   },
   {
     icon: Syringe,
     label: "Registrar Vacina",
     description: "Atualizar saúde",
     variant: "outline" as const,
+    action: "newVaccine",
   },
   {
     icon: Calendar,
     label: "Agendar Evento",
     description: "Criar compromisso",
     variant: "outline" as const,
+    action: "newEvent",
   },
   {
     icon: FileText,
     label: "Gerar Relatório",
     description: "Exportar dados",
     variant: "outline" as const,
+    action: "report",
   },
 ];
 
-export function QuickActions() {
+export function QuickActions({
+  onNewHorse,
+  onNewVaccine,
+  onNewEvent,
+  onReport,
+}: QuickActionsProps) {
+  const handleAction = (action: string) => {
+    switch (action) {
+      case "newHorse":
+        onNewHorse?.();
+        break;
+      case "newVaccine":
+        onNewVaccine?.();
+        break;
+      case "newEvent":
+        onNewEvent?.();
+        break;
+      case "report":
+        onReport?.();
+        break;
+    }
+  };
+
   return (
     <div className="bg-card rounded-xl shadow-soft p-5 animate-fade-in">
       <h2 className="text-lg font-semibold text-foreground mb-4">
@@ -42,6 +75,7 @@ export function QuickActions() {
             variant={action.variant}
             className="h-auto flex-col items-start gap-2 p-4 text-left"
             style={{ animationDelay: `${index * 50}ms` }}
+            onClick={() => handleAction(action.action)}
           >
             <action.icon className="h-5 w-5" />
             <div>

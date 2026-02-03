@@ -1,15 +1,26 @@
-import { Heart, Calendar, MoreVertical } from "lucide-react";
+import { Heart, Calendar, MoreVertical, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface HorseCardProps {
+  id?: string;
   name: string;
   breed: string;
   age: string;
   status: "saudável" | "em tratamento" | "observação";
   imageUrl?: string;
   nextEvent?: string;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
+  onDelete?: () => void;
 }
 
 const statusConfig = {
@@ -28,14 +39,19 @@ const statusConfig = {
 };
 
 export function HorseCard({
+  id,
   name,
   breed,
   age,
   status,
   imageUrl,
   nextEvent,
+  isFavorite = false,
+  onToggleFavorite,
+  onDelete,
 }: HorseCardProps) {
   const config = statusConfig[status];
+  const navigate = useNavigate();
 
   return (
     <div className="group bg-card rounded-xl shadow-soft hover:shadow-card transition-all duration-300 overflow-hidden animate-fade-in">
@@ -70,13 +86,32 @@ export function HorseCard({
           <span className={cn("h-1.5 w-1.5 rounded-full", config.dot)} />
           {status}
         </Badge>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 right-2 h-8 w-8 bg-background/50 backdrop-blur-sm hover:bg-background/80"
-        >
-          <MoreVertical className="h-4 w-4" />
-        </Button>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 h-8 w-8 bg-background/50 backdrop-blur-sm hover:bg-background/80"
+            >
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => navigate(`/cavalos`)}>
+              Ver Detalhes
+            </DropdownMenuItem>
+            {onDelete && (
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onClick={onDelete}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Remover
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Content */}
@@ -88,7 +123,6 @@ export function HorseCard({
           </p>
         </div>
 
-
         {nextEvent && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-lg px-3 py-2">
             <Calendar className="h-3.5 w-3.5 text-horse-sage" />
@@ -97,11 +131,26 @@ export function HorseCard({
         )}
 
         <div className="flex gap-2 pt-2">
-          <Button variant="outline" size="sm" className="flex-1 text-xs">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 text-xs"
+            onClick={() => navigate("/cavalos")}
+          >
             Ver Detalhes
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Heart className="h-4 w-4" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={onToggleFavorite}
+          >
+            <Heart
+              className={cn(
+                "h-4 w-4 transition-colors",
+                isFavorite ? "fill-destructive text-destructive" : ""
+              )}
+            />
           </Button>
         </div>
       </div>
