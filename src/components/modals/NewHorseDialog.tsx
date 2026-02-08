@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Horse } from "@/types";
 import { toast } from "sonner";
+import { Camera, X } from "lucide-react";
 
 interface NewHorseDialogProps {
   open: boolean;
@@ -28,6 +29,8 @@ interface NewHorseDialogProps {
 }
 
 export function NewHorseDialog({ open, onOpenChange, onSave }: NewHorseDialogProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     breed: "",
