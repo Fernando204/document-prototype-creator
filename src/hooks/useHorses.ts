@@ -1,5 +1,5 @@
 import { useLocalStorage } from "./useLocalStorage";
-import { Horse, Activity } from "@/types";
+import { Horse, Activity, HealthEvent, Competition, Reproduction } from "@/types";
 import { useCallback } from "react";
 import horse1 from "@/assets/horse-1.jpg";
 import horse2 from "@/assets/horse-2.jpg";
@@ -66,6 +66,9 @@ const initialHorses: Horse[] = [
 export function useHorses() {
   const [horses, setHorses] = useLocalStorage<Horse[]>("horsecontrol-horses", initialHorses);
   const [activities, setActivities] = useLocalStorage<Activity[]>("horsecontrol-activities", []);
+  const [events, setEvents] = useLocalStorage<HealthEvent[]>("horsecontrol-events", []);
+  const [competitions, setCompetitions] = useLocalStorage<Competition[]>("horsecontrol-competitions", []);
+  const [reproductions, setReproductions] = useLocalStorage<Reproduction[]>("horsecontrol-reproductions", []);
 
   const addActivity = useCallback((activity: Omit<Activity, "id" | "timestamp">) => {
     const newActivity: Activity = {
@@ -103,15 +106,35 @@ export function useHorses() {
 
   const deleteHorse = useCallback((id: string) => {
     const horse = horses.find((h) => h.id === id);
+    
+    // Cascade delete all related data
+    // 1. Delete events related to this horse
+    setEvents((prev) => prev.filter((e) => e.horseId !== id));
+    
+    // 2. Delete reproductions where horse is mare or stallion
+    setReproductions((prev) => prev.filter((r) => r.mareId !== id && r.stallionId !== id));
+    
+    // 3. Remove horse from competitions (or delete competition if only horse)
+    setCompetitions((prev) => 
+      prev
+        .map((c) => ({
+          ...c,
+          horses: c.horses.filter((h) => h.horseId !== id),
+        }))
+        .filter((c) => c.horses.length > 0) // Remove competitions with no horses
+    );
+    
+    // 4. Delete the horse
     setHorses((prev) => prev.filter((h) => h.id !== id));
+    
     if (horse) {
       addActivity({
         type: "warning",
-        message: `Cavalo removido: ${horse.name}`,
+        message: `Cavalo removido: ${horse.name} (e todos os dados relacionados)`,
         relatedType: "horse",
       });
     }
-  }, [horses, setHorses, addActivity]);
+  }, [horses, setHorses, setEvents, setReproductions, setCompetitions, addActivity]);
 
   const toggleFavorite = useCallback((id: string) => {
     setHorses((prev) =>
