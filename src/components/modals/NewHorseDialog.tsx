@@ -45,6 +45,28 @@ export function NewHorseDialog({ open, onOpenChange, onSave }: NewHorseDialogPro
     notes: "",
   });
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("A imagem deve ter no máximo 5MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -61,6 +83,7 @@ export function NewHorseDialog({ open, onOpenChange, onSave }: NewHorseDialogPro
       color: formData.color,
       sex: formData.sex,
       status: formData.status,
+      imageUrl: imagePreview || undefined,
       pedigree: {
         father: formData.fatherName,
         mother: formData.motherName,
@@ -84,6 +107,7 @@ export function NewHorseDialog({ open, onOpenChange, onSave }: NewHorseDialogPro
       registry: "",
       notes: "",
     });
+    setImagePreview(null);
     
     onOpenChange(false);
     toast.success("Cavalo cadastrado com sucesso!");
