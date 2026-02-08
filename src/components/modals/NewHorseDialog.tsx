@@ -124,6 +124,53 @@ export function NewHorseDialog({ open, onOpenChange, onSave }: NewHorseDialogPro
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Image Upload */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-foreground">Foto do Cavalo</h3>
+            <div className="flex items-center gap-4">
+              <div 
+                className="relative w-32 h-32 rounded-lg border-2 border-dashed border-muted-foreground/25 flex items-center justify-center overflow-hidden cursor-pointer hover:border-primary/50 transition-colors"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {imagePreview ? (
+                  <>
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveImage();
+                      }}
+                      className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </>
+                ) : (
+                  <div className="text-center">
+                    <Camera className="h-8 w-8 mx-auto text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground mt-1">Clique para adicionar</span>
+                  </div>
+                )}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+              <div className="text-sm text-muted-foreground">
+                <p>Formatos aceitos: JPG, PNG, WEBP</p>
+                <p>Tamanho máximo: 5MB</p>
+              </div>
+            </div>
+          </div>
+
           {/* Basic Info */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-foreground">Informações Básicas</h3>
