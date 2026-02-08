@@ -10,6 +10,7 @@ import Estoque from "./pages/Estoque";
 import Competicao from "./pages/Competicao";
 import Reproducao from "./pages/Reproducao";
 import Financeiro from "./pages/Financeiro";
+import Agenda from "./pages/Agenda";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
