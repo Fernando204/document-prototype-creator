@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Horse } from "@/types";
 import { toast } from "sonner";
+import { Camera, X } from "lucide-react";
 
 interface NewHorseDialogProps {
   open: boolean;
@@ -28,6 +29,8 @@ interface NewHorseDialogProps {
 }
 
 export function NewHorseDialog({ open, onOpenChange, onSave }: NewHorseDialogProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     breed: "",
@@ -41,6 +44,28 @@ export function NewHorseDialog({ open, onOpenChange, onSave }: NewHorseDialogPro
     registry: "",
     notes: "",
   });
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("A imagem deve ter no máximo 5MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +83,7 @@ export function NewHorseDialog({ open, onOpenChange, onSave }: NewHorseDialogPro
       color: formData.color,
       sex: formData.sex,
       status: formData.status,
+      imageUrl: imagePreview || undefined,
       pedigree: {
         father: formData.fatherName,
         mother: formData.motherName,
@@ -81,6 +107,7 @@ export function NewHorseDialog({ open, onOpenChange, onSave }: NewHorseDialogPro
       registry: "",
       notes: "",
     });
+    setImagePreview(null);
     
     onOpenChange(false);
     toast.success("Cavalo cadastrado com sucesso!");
@@ -97,6 +124,53 @@ export function NewHorseDialog({ open, onOpenChange, onSave }: NewHorseDialogPro
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Image Upload */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-foreground">Foto do Cavalo</h3>
+            <div className="flex items-center gap-4">
+              <div 
+                className="relative w-32 h-32 rounded-lg border-2 border-dashed border-muted-foreground/25 flex items-center justify-center overflow-hidden cursor-pointer hover:border-primary/50 transition-colors"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {imagePreview ? (
+                  <>
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveImage();
+                      }}
+                      className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </>
+                ) : (
+                  <div className="text-center">
+                    <Camera className="h-8 w-8 mx-auto text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground mt-1">Clique para adicionar</span>
+                  </div>
+                )}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+              <div className="text-sm text-muted-foreground">
+                <p>Formatos aceitos: JPG, PNG, WEBP</p>
+                <p>Tamanho máximo: 5MB</p>
+              </div>
+            </div>
+          </div>
+
           {/* Basic Info */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-foreground">Informações Básicas</h3>
