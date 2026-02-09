@@ -20,7 +20,7 @@ import {
 
 const Cavalos = () => {
   const { horses, addHorse, toggleFavorite, deleteHorse } = useHorses();
-  const { getEventsByHorse } = useEvents();
+  const { events, getEventsByHorse } = useEvents();
   const [isNewHorseOpen, setIsNewHorseOpen] = useState(false);
   const [selectedHorse, setSelectedHorse] = useState<Horse | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
