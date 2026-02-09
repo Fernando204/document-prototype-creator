@@ -137,7 +137,7 @@ export function HorseCard({
             variant="outline"
             size="sm"
             className="flex-1 text-xs"
-            onClick={() => navigate("/cavalos")}
+            onClick={onViewDetails}
           >
             Ver Detalhes
           </Button>
