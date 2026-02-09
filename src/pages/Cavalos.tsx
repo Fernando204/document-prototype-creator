@@ -128,6 +128,7 @@ const Cavalos = () => {
                 isFavorite={horse.isFavorite}
                 onToggleFavorite={() => toggleFavorite(horse.id)}
                 onDelete={() => deleteHorse(horse.id)}
+                onViewDetails={() => setSelectedHorse(horse)}
               />
             ))}
           </div>
