@@ -21,6 +21,7 @@ interface HorseCardProps {
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
   onDelete?: () => void;
+  onViewDetails?: () => void;
 }
 
 const statusConfig = {
