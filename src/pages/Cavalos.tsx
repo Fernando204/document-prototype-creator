@@ -23,8 +23,11 @@ const Cavalos = () => {
   const { horses, addHorse, toggleFavorite, deleteHorse } = useHorses();
   const { getEventsByHorse } = useEvents();
   const [isNewHorseOpen, setIsNewHorseOpen] = useState(false);
+  const [selectedHorse, setSelectedHorse] = useState<Horse | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [competitions] = useLocalStorage<Competition[]>("horsecontrol-competitions", []);
+  const [reproductions] = useLocalStorage<Reproduction[]>("horsecontrol-reproductions", []);
 
   const filteredHorses = horses.filter((horse) => {
     const matchesSearch = horse.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
