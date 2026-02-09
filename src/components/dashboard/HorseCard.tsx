@@ -100,7 +100,7 @@ export function HorseCard({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => navigate(`/cavalos`)}>
+            <DropdownMenuItem onClick={onViewDetails}>
               Ver Detalhes
             </DropdownMenuItem>
             {onDelete && (
