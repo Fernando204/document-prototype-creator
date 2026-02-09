@@ -50,6 +50,7 @@ export function HorseCard({
   isFavorite = false,
   onToggleFavorite,
   onDelete,
+  onViewDetails,
 }: HorseCardProps) {
   const config = statusConfig[status];
   const navigate = useNavigate();
