@@ -146,6 +146,7 @@ const Index = () => {
                   nextEvent={getNextEvent(horse.id)}
                   isFavorite={horse.isFavorite}
                   onToggleFavorite={() => toggleFavorite(horse.id)}
+                  onViewDetails={() => setSelectedHorse(horse)}
                 />
               ))}
             </div>
