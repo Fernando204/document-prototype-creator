@@ -1,7 +1,7 @@
-import { Search, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { NotificationPanel } from "./NotificationPanel";
+import { UserProfileModal } from "@/components/modals/UserProfileModal";
 
 export function Header() {
   return (
@@ -20,12 +20,7 @@ export function Header() {
         {/* Actions */}
         <div className="flex items-center gap-2">
           <NotificationPanel />
-
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <div className="h-8 w-8 rounded-full bg-gradient-hero flex items-center justify-center">
-              <User className="h-4 w-4 text-primary-foreground" />
-            </div>
-          </Button>
+          <UserProfileModal />
         </div>
       </div>
     </header>
