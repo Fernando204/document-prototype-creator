@@ -12,6 +12,8 @@ import Reproducao from "./pages/Reproducao";
 import Financeiro from "./pages/Financeiro";
 import Agenda from "./pages/Agenda";
 import Configuracoes from "./pages/Configuracoes";
+import Login from "./pages/Login";
+import Registro from "./pages/Registro";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
