@@ -8,7 +8,6 @@ import { useState } from "react";
 import { Plus, Search, Filter } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Competition, Reproduction, Horse } from "@/types";
-import { Plus, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
