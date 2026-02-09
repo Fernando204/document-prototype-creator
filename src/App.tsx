@@ -12,6 +12,8 @@ import Reproducao from "./pages/Reproducao";
 import Financeiro from "./pages/Financeiro";
 import Agenda from "./pages/Agenda";
 import Configuracoes from "./pages/Configuracoes";
+import Login from "./pages/Login";
+import Registro from "./pages/Registro";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +25,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/registro" element={<Registro />} />
           <Route path="/" element={<Index />} />
           <Route path="/cavalos" element={<Cavalos />} />
           <Route path="/saude" element={<Saude />} />
