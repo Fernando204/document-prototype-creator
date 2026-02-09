@@ -9,6 +9,9 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 import { NewHorseDialog } from "@/components/modals/NewHorseDialog";
 import { NewEventDialog } from "@/components/modals/NewEventDialog";
 import { ReportDialog } from "@/components/modals/ReportDialog";
+import { HorseDetailDialog } from "@/components/modals/HorseDetailDialog";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { Competition, Reproduction, Horse } from "@/types";
 import { useHorses } from "@/hooks/useHorses";
 import { useEvents } from "@/hooks/useEvents";
 import { useStock } from "@/hooks/useStock";
@@ -40,6 +43,9 @@ const Index = () => {
   const [isNewEventOpen, setIsNewEventOpen] = useState(false);
   const [isVaccineOpen, setIsVaccineOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
+  const [selectedHorse, setSelectedHorse] = useState<Horse | null>(null);
+  const [competitions] = useLocalStorage<Competition[]>("horsecontrol-competitions", []);
+  const [reproductions] = useLocalStorage<Reproduction[]>("horsecontrol-reproductions", []);
 
   const upcomingEvents = getUpcomingEvents(4);
   const lowStockCount = getLowStockItems().length;
@@ -140,6 +146,7 @@ const Index = () => {
                   nextEvent={getNextEvent(horse.id)}
                   isFavorite={horse.isFavorite}
                   onToggleFavorite={() => toggleFavorite(horse.id)}
+                  onViewDetails={() => setSelectedHorse(horse)}
                 />
               ))}
             </div>
@@ -241,6 +248,14 @@ const Index = () => {
         onOpenChange={setIsReportOpen}
         horses={horses}
         events={events}
+      />
+      <HorseDetailDialog
+        open={!!selectedHorse}
+        onOpenChange={(open) => !open && setSelectedHorse(null)}
+        horse={selectedHorse}
+        events={events}
+        competitions={competitions}
+        reproductions={reproductions}
       />
     </MainLayout>
   );

@@ -21,6 +21,7 @@ interface HorseCardProps {
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
   onDelete?: () => void;
+  onViewDetails?: () => void;
 }
 
 const statusConfig = {
@@ -49,6 +50,7 @@ export function HorseCard({
   isFavorite = false,
   onToggleFavorite,
   onDelete,
+  onViewDetails,
 }: HorseCardProps) {
   const config = statusConfig[status];
   const navigate = useNavigate();
@@ -98,7 +100,7 @@ export function HorseCard({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => navigate(`/cavalos`)}>
+            <DropdownMenuItem onClick={onViewDetails}>
               Ver Detalhes
             </DropdownMenuItem>
             {onDelete && (
@@ -135,7 +137,7 @@ export function HorseCard({
             variant="outline"
             size="sm"
             className="flex-1 text-xs"
-            onClick={() => navigate("/cavalos")}
+            onClick={onViewDetails}
           >
             Ver Detalhes
           </Button>

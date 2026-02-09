@@ -52,7 +52,7 @@ export default function Registro() {
           <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-primary-foreground/10 blur-3xl" />
         </div>
         <div className="relative z-10 text-center px-12">
-          <img src={logo} alt="Horse Control" className="h-20 mx-auto mb-8" />
+          <img src={logo} alt="Horse Control" className="h-20 mx-auto mb-8 brightness-0 invert" />
           <h1 className="text-4xl font-bold text-primary-foreground mb-4">
             Horse Control
           </h1>

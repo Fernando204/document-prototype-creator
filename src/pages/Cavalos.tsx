@@ -3,8 +3,11 @@ import { useHorses } from "@/hooks/useHorses";
 import { useEvents } from "@/hooks/useEvents";
 import { HorseCard } from "@/components/dashboard/HorseCard";
 import { NewHorseDialog } from "@/components/modals/NewHorseDialog";
+import { HorseDetailDialog } from "@/components/modals/HorseDetailDialog";
 import { useState } from "react";
 import { Plus, Search, Filter } from "lucide-react";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { Competition, Reproduction, Horse } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,10 +20,13 @@ import {
 
 const Cavalos = () => {
   const { horses, addHorse, toggleFavorite, deleteHorse } = useHorses();
-  const { getEventsByHorse } = useEvents();
+  const { events, getEventsByHorse } = useEvents();
   const [isNewHorseOpen, setIsNewHorseOpen] = useState(false);
+  const [selectedHorse, setSelectedHorse] = useState<Horse | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [competitions] = useLocalStorage<Competition[]>("horsecontrol-competitions", []);
+  const [reproductions] = useLocalStorage<Reproduction[]>("horsecontrol-reproductions", []);
 
   const filteredHorses = horses.filter((horse) => {
     const matchesSearch = horse.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -121,6 +127,7 @@ const Cavalos = () => {
                 isFavorite={horse.isFavorite}
                 onToggleFavorite={() => toggleFavorite(horse.id)}
                 onDelete={() => deleteHorse(horse.id)}
+                onViewDetails={() => setSelectedHorse(horse)}
               />
             ))}
           </div>
@@ -131,6 +138,15 @@ const Cavalos = () => {
         open={isNewHorseOpen}
         onOpenChange={setIsNewHorseOpen}
         onSave={addHorse}
+      />
+
+      <HorseDetailDialog
+        open={!!selectedHorse}
+        onOpenChange={(open) => !open && setSelectedHorse(null)}
+        horse={selectedHorse}
+        events={events}
+        competitions={competitions}
+        reproductions={reproductions}
       />
     </MainLayout>
   );
