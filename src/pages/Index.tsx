@@ -43,6 +43,9 @@ const Index = () => {
   const [isNewEventOpen, setIsNewEventOpen] = useState(false);
   const [isVaccineOpen, setIsVaccineOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
+  const [selectedHorse, setSelectedHorse] = useState<Horse | null>(null);
+  const [competitions] = useLocalStorage<Competition[]>("horsecontrol-competitions", []);
+  const [reproductions] = useLocalStorage<Reproduction[]>("horsecontrol-reproductions", []);
 
   const upcomingEvents = getUpcomingEvents(4);
   const lowStockCount = getLowStockItems().length;
