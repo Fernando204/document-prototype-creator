@@ -6,7 +6,7 @@ import { HorseCard } from "@/components/dashboard/HorseCard";
 import { UpcomingEvents } from "@/components/dashboard/UpcomingEvents";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { QuickActions } from "@/components/dashboard/QuickActions";
-import { NewHorseDialog } from "@/components/modals/NewHorseDialog";
+import { HorseFormDialog } from "@/components/modals/HorseFormDialog";
 import { NewEventDialog } from "@/components/modals/NewEventDialog";
 import { ReportDialog } from "@/components/modals/ReportDialog";
 import { HorseDetailDialog } from "@/components/modals/HorseDetailDialog";
