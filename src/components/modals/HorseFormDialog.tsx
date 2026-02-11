@@ -26,7 +26,7 @@ import { calculateAge } from "@/lib/calculateAge";
 interface HorseFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (horse: Omit<Horse, "id" | "createdAt" | "updatedAt">) => Promise<void> | void;
+  onSave: (horse: Omit<Horse, "id" | "createdAt" | "updatedAt">) => Promise<any> | any;
   horse?: Horse | null; // If provided, edit mode
 }
 
