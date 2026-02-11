@@ -225,7 +225,7 @@ const Index = () => {
       </div>
 
       {/* Modals */}
-      <NewHorseDialog
+      <HorseFormDialog
         open={isNewHorseOpen}
         onOpenChange={setIsNewHorseOpen}
         onSave={addHorse}
