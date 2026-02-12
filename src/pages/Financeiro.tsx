@@ -269,7 +269,7 @@ const Financeiro = () => {
                         <SelectItem value="Outro">Outro</SelectItem>
                       </>
                     ) : (
-                      <SelectItem value="" disabled>Selecione o tipo primeiro</SelectItem>
+                      <SelectItem value="__placeholder" disabled>Selecione o tipo primeiro</SelectItem>
                     )}
                   </SelectContent>
                 </Select>
