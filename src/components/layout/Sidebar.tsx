@@ -11,6 +11,7 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  Users,
 } from "lucide-react";
 import logo from "@/assets/horsecontrol_logo.svg";
 import { cn } from "@/lib/utils";
@@ -40,6 +41,7 @@ const menuItems = [
   { icon: Trophy, label: "Competição", path: "/competicao" },
   { icon: Baby, label: "Reprodução", path: "/reproducao" },
   { icon: Wallet, label: "Financeiro", path: "/financeiro" },
+  { icon: Users, label: "Colaboradores", path: "/colaboradores" },
 ];
 
 export function Sidebar() {
