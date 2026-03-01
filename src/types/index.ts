@@ -29,9 +29,11 @@ export interface HealthEvent {
   description?: string;
   date: string;
   time?: string;
+  endTime?: string;
   status: "agendado" | "concluído" | "cancelado";
   veterinarian?: string;
   cost?: number;
+  colaboradorIds?: string[];
   createdAt: string;
 }
 
