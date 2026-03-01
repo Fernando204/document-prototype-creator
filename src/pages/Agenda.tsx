@@ -1,12 +1,14 @@
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useEvents } from "@/hooks/useEvents";
 import { useHorses } from "@/hooks/useHorses";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { NewEventDialog } from "@/components/modals/NewEventDialog";
+import { EditEventDialog } from "@/components/modals/EditEventDialog";
 import {
   Select,
   SelectContent,
@@ -26,16 +28,31 @@ import {
   Wrench,
   Bug,
   MoreHorizontal,
+  Users,
 } from "lucide-react";
 import { format, isSameDay, parseISO, isAfter, isBefore, startOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { HealthEvent } from "@/types";
 
+interface Colaborador {
+  id: string;
+  nome: string;
+  funcao: string;
+  telefone: string;
+  email: string;
+  dataAdmissao: string;
+  status: "ativo" | "inativo";
+  observacoes: string;
+  horario: any;
+}
+
 const Agenda = () => {
-  const { events, addEvent, updateEvent } = useEvents();
+  const { events, addEvent, updateEvent, deleteEvent } = useEvents();
   const { horses } = useHorses();
+  const [colaboradores] = useLocalStorage<Colaborador[]>("horsecontrol-colaboradores", []);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [isNewEventOpen, setIsNewEventOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<HealthEvent | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterType, setFilterType] = useState<string>("all");
 
@@ -83,19 +100,18 @@ const Agenda = () => {
     );
   };
 
-  // Filter events
+  const getColabName = (id: string) => colaboradores.find((c) => c.id === id)?.nome ?? "?";
+
   const filteredEvents = events.filter((event) => {
     const matchesStatus = filterStatus === "all" || event.status === filterStatus;
     const matchesType = filterType === "all" || event.type === filterType;
     return matchesStatus && matchesType;
   });
 
-  // Get events for selected date
   const eventsForSelectedDate = selectedDate
     ? filteredEvents.filter((event) => isSameDay(parseISO(event.date), selectedDate))
     : [];
 
-  // Get upcoming events (next 7 days)
   const today = startOfDay(new Date());
   const nextWeek = new Date(today);
   nextWeek.setDate(nextWeek.getDate() + 7);
@@ -107,13 +123,11 @@ const Agenda = () => {
     })
     .sort((a, b) => a.date.localeCompare(b.date));
 
-  // Get overdue events
   const overdueEvents = filteredEvents.filter((event) => {
     const eventDate = parseISO(event.date);
     return event.status === "agendado" && isBefore(eventDate, today);
   });
 
-  // Get dates with events for calendar highlighting
   const datesWithEvents = events.map((event) => parseISO(event.date));
 
   const handleMarkComplete = (eventId: string) => {
@@ -136,7 +150,7 @@ const Agenda = () => {
           <div>
             <h1 className="text-2xl font-bold text-foreground">Agenda</h1>
             <p className="text-muted-foreground">
-              Gerencie todos os eventos e compromissos dos seus cavalos
+              Gerencie todos os eventos e compromissos
             </p>
           </div>
           <Button onClick={() => setIsNewEventOpen(true)}>
@@ -197,8 +211,8 @@ const Agenda = () => {
                       <Button size="sm" variant="outline" onClick={() => handleMarkComplete(event.id)}>
                         Concluir
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => handleCancelEvent(event.id)}>
-                        Cancelar
+                      <Button size="sm" variant="ghost" onClick={() => setEditingEvent(event)}>
+                        Editar
                       </Button>
                     </div>
                   </div>
@@ -225,9 +239,7 @@ const Agenda = () => {
                 onSelect={setSelectedDate}
                 locale={ptBR}
                 className="rounded-md border"
-                modifiers={{
-                  hasEvent: datesWithEvents,
-                }}
+                modifiers={{ hasEvent: datesWithEvents }}
                 modifiersStyles={{
                   hasEvent: {
                     fontWeight: "bold",
@@ -253,11 +265,7 @@ const Agenda = () => {
                 <div className="text-center py-8 text-muted-foreground">
                   <CalendarDays className="h-12 w-12 mx-auto mb-2 opacity-50" />
                   <p>Nenhum evento nesta data</p>
-                  <Button
-                    variant="outline"
-                    className="mt-4"
-                    onClick={() => setIsNewEventOpen(true)}
-                  >
+                  <Button variant="outline" className="mt-4" onClick={() => setIsNewEventOpen(true)}>
                     <Plus className="h-4 w-4 mr-2" />
                     Adicionar Evento
                   </Button>
@@ -269,7 +277,8 @@ const Agenda = () => {
                     return (
                       <div
                         key={event.id}
-                        className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg"
+                        className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted transition-colors"
+                        onClick={() => setEditingEvent(event)}
                       >
                         <div className="p-2 rounded-full bg-primary/10">
                           <Icon className="h-5 w-5 text-primary" />
@@ -281,14 +290,20 @@ const Agenda = () => {
                               <p className="text-sm text-muted-foreground">
                                 {getHorseName(event.horseId)}
                                 {event.time && ` • ${event.time}`}
+                                {event.endTime && `–${event.endTime}`}
                               </p>
                               {event.description && (
                                 <p className="text-sm mt-1">{event.description}</p>
                               )}
-                              {event.veterinarian && (
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  Veterinário: {event.veterinarian}
-                                </p>
+                              {event.colaboradorIds && event.colaboradorIds.length > 0 && (
+                                <div className="flex items-center gap-1 mt-1 flex-wrap">
+                                  <Users className="h-3 w-3 text-muted-foreground" />
+                                  {event.colaboradorIds.map((cId) => (
+                                    <Badge key={cId} variant="outline" className="text-[10px] px-1.5 py-0">
+                                      {getColabName(cId)}
+                                    </Badge>
+                                  ))}
+                                </div>
                               )}
                             </div>
                             <div className="flex flex-col items-end gap-2">
@@ -298,19 +313,11 @@ const Agenda = () => {
                           </div>
                           {event.status === "agendado" && (
                             <div className="flex gap-2 mt-3">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleMarkComplete(event.id)}
-                              >
+                              <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); handleMarkComplete(event.id); }}>
                                 <CheckCircle className="h-3 w-3 mr-1" />
-                                Marcar como Concluído
+                                Concluir
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleCancelEvent(event.id)}
-                              >
+                              <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); handleCancelEvent(event.id); }}>
                                 Cancelar
                               </Button>
                             </div>
@@ -343,7 +350,7 @@ const Agenda = () => {
                     <div
                       key={event.id}
                       className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted transition-colors"
-                      onClick={() => setSelectedDate(parseISO(event.date))}
+                      onClick={() => setEditingEvent(event)}
                     >
                       <div className="p-2 rounded-full bg-primary/10">
                         <Icon className="h-4 w-4 text-primary" />
@@ -353,14 +360,18 @@ const Agenda = () => {
                         <p className="text-xs text-muted-foreground">
                           {getHorseName(event.horseId)}
                         </p>
+                        {event.colaboradorIds && event.colaboradorIds.length > 0 && (
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <Users className="h-2.5 w-2.5 text-muted-foreground" />
+                            <span className="text-[10px] text-muted-foreground">
+                              {event.colaboradorIds.map((id) => getColabName(id)).join(", ")}
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium">
-                          {format(parseISO(event.date), "dd/MM")}
-                        </p>
-                        {event.time && (
-                          <p className="text-xs text-muted-foreground">{event.time}</p>
-                        )}
+                        <p className="text-sm font-medium">{format(parseISO(event.date), "dd/MM")}</p>
+                        {event.time && <p className="text-xs text-muted-foreground">{event.time}</p>}
                       </div>
                     </div>
                   );
@@ -376,7 +387,20 @@ const Agenda = () => {
         onOpenChange={setIsNewEventOpen}
         onSave={addEvent}
         horses={horses}
+        colaboradores={colaboradores}
       />
+
+      {editingEvent && (
+        <EditEventDialog
+          open={!!editingEvent}
+          onOpenChange={(open) => !open && setEditingEvent(null)}
+          event={editingEvent}
+          onSave={updateEvent}
+          onDelete={deleteEvent}
+          horses={horses}
+          colaboradores={colaboradores}
+        />
+      )}
     </MainLayout>
   );
 };
