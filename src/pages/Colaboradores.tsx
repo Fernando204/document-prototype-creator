@@ -26,9 +26,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Users, Plus, Pencil, Trash2, Phone, Mail } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Users, Plus, Pencil, Trash2, Phone, Mail, Calendar, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { WorkScheduleEditor, emptySchedule, type WeekSchedule } from "@/components/colaboradores/WorkScheduleEditor";
+import { ColaboradorAgenda } from "@/components/colaboradores/ColaboradorAgenda";
+import { TaskDialog, type ColaboradorTask } from "@/components/colaboradores/TaskDialog";
 
 interface Colaborador {
   id: string;
@@ -39,6 +43,7 @@ interface Colaborador {
   dataAdmissao: string;
   status: "ativo" | "inativo";
   observacoes: string;
+  horario: WeekSchedule;
 }
 
 const funcoes = [
@@ -62,6 +67,7 @@ const emptyForm: Omit<Colaborador, "id"> = {
   dataAdmissao: "",
   status: "ativo",
   observacoes: "",
+  horario: emptySchedule,
 };
 
 const Colaboradores = () => {
@@ -69,11 +75,22 @@ const Colaboradores = () => {
     "horsecontrol-colaboradores",
     []
   );
+  const [tasks, setTasks] = useLocalStorage<ColaboradorTask[]>(
+    "horsecontrol-colaborador-tasks",
+    []
+  );
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [filterFuncao, setFilterFuncao] = useState<string>("todas");
+
+  // Agenda state
+  const [selectedColabId, setSelectedColabId] = useState<string | null>(null);
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<ColaboradorTask | null>(null);
+
+  const selectedColab = colaboradores.find((c) => c.id === selectedColabId);
 
   const openNew = () => {
     setEditingId(null);
@@ -91,6 +108,7 @@ const Colaboradores = () => {
       dataAdmissao: c.dataAdmissao,
       status: c.status,
       observacoes: c.observacoes,
+      horario: c.horario ?? emptySchedule,
     });
     setDialogOpen(true);
   };
@@ -109,10 +127,7 @@ const Colaboradores = () => {
       );
       toast.success("Colaborador atualizado!");
     } else {
-      const novo: Colaborador = {
-        ...form,
-        id: crypto.randomUUID(),
-      };
+      const novo: Colaborador = { ...form, id: crypto.randomUUID() };
       setColaboradores((prev) => [...prev, novo]);
       toast.success("Colaborador cadastrado!");
     }
@@ -122,6 +137,8 @@ const Colaboradores = () => {
 
   const handleDelete = (id: string) => {
     setColaboradores((prev) => prev.filter((c) => c.id !== id));
+    setTasks((prev) => prev.filter((t) => t.colaboradorId !== id));
+    if (selectedColabId === id) setSelectedColabId(null);
     toast.success("Colaborador removido.");
   };
 
@@ -134,6 +151,22 @@ const Colaboradores = () => {
       )
     );
     toast.success("Status atualizado.");
+  };
+
+  // Task handlers
+  const handleSaveTask = (task: ColaboradorTask) => {
+    setTasks((prev) => {
+      const exists = prev.find((t) => t.id === task.id);
+      if (exists) return prev.map((t) => (t.id === task.id ? task : t));
+      return [...prev, task];
+    });
+    toast.success(editingTask ? "Tarefa atualizada!" : "Tarefa agendada!");
+    setEditingTask(null);
+  };
+
+  const handleDeleteTask = (id: string) => {
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+    toast.success("Tarefa removida.");
   };
 
   const filtered =
@@ -152,217 +185,299 @@ const Colaboradores = () => {
               Colaboradores
             </h1>
             <p className="text-muted-foreground">
-              Gerencie os funcionários da propriedade.
+              Gerencie funcionários, horários e tarefas.
             </p>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={openNew}>
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Colaborador
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-lg">
-              <DialogHeader>
-                <DialogTitle>
-                  {editingId ? "Editar Colaborador" : "Novo Colaborador"}
-                </DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-2">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Nome *</Label>
-                    <Input
-                      value={form.nome}
-                      onChange={(e) =>
-                        setForm({ ...form, nome: e.target.value })
-                      }
-                      placeholder="Nome completo"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Função *</Label>
-                    <Select
-                      value={form.funcao}
-                      onValueChange={(v) => setForm({ ...form, funcao: v })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {funcoes.map((f) => (
-                          <SelectItem key={f} value={f}>
-                            {f}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Telefone</Label>
-                    <Input
-                      value={form.telefone}
-                      onChange={(e) =>
-                        setForm({ ...form, telefone: e.target.value })
-                      }
-                      placeholder="(00) 00000-0000"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Email</Label>
-                    <Input
-                      type="email"
-                      value={form.email}
-                      onChange={(e) =>
-                        setForm({ ...form, email: e.target.value })
-                      }
-                      placeholder="email@exemplo.com"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Data de Admissão</Label>
-                    <Input
-                      type="date"
-                      value={form.dataAdmissao}
-                      onChange={(e) =>
-                        setForm({ ...form, dataAdmissao: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Status</Label>
-                    <Select
-                      value={form.status}
-                      onValueChange={(v) =>
-                        setForm({ ...form, status: v as "ativo" | "inativo" })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ativo">Ativo</SelectItem>
-                        <SelectItem value="inativo">Inativo</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+          <Button onClick={openNew}>
+            <Plus className="h-4 w-4 mr-2" /> Novo Colaborador
+          </Button>
+        </div>
+
+        <Tabs defaultValue="lista">
+          <TabsList>
+            <TabsTrigger value="lista">
+              <Users className="h-4 w-4 mr-1" /> Equipe
+            </TabsTrigger>
+            <TabsTrigger value="agenda">
+              <Calendar className="h-4 w-4 mr-1" /> Agenda
+            </TabsTrigger>
+          </TabsList>
+
+          {/* ===== TAB LISTA ===== */}
+          <TabsContent value="lista" className="space-y-4">
+            {/* Filter */}
+            <div className="flex items-center gap-3">
+              <Label className="text-sm text-muted-foreground">Filtrar por função:</Label>
+              <Select value={filterFuncao} onValueChange={setFilterFuncao}>
+                <SelectTrigger className="w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todas">Todas</SelectItem>
+                  {funcoes.map((f) => (
+                    <SelectItem key={f} value={f}>{f}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {filtered.length === 0 ? (
+              <div className="bg-card rounded-xl shadow-soft p-12 text-center">
+                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                <h3 className="text-lg font-semibold text-foreground mb-1">
+                  Nenhum colaborador cadastrado
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  Clique em "Novo Colaborador" para começar.
+                </p>
+              </div>
+            ) : (
+              <div className="bg-card rounded-xl shadow-soft overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Função</TableHead>
+                      <TableHead className="hidden md:table-cell">Contato</TableHead>
+                      <TableHead className="hidden lg:table-cell">Horário</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.map((c) => {
+                      const workDays = (Object.keys(c.horario ?? {}) as (keyof WeekSchedule)[])
+                        .filter((d) => (c.horario?.[d]?.length ?? 0) > 0).length;
+
+                      return (
+                        <TableRow key={c.id}>
+                          <TableCell className="font-medium">{c.nome}</TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">{c.funcao}</Badge>
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell">
+                            <div className="flex flex-col gap-1 text-sm text-muted-foreground">
+                              {c.telefone && (
+                                <span className="flex items-center gap-1">
+                                  <Phone className="h-3 w-3" /> {c.telefone}
+                                </span>
+                              )}
+                              {c.email && (
+                                <span className="flex items-center gap-1">
+                                  <Mail className="h-3 w-3" /> {c.email}
+                                </span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="hidden lg:table-cell">
+                            {workDays > 0 ? (
+                              <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Clock className="h-3 w-3" /> {workDays} dias/semana
+                              </span>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">Não definido</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={c.status === "ativo" ? "default" : "outline"}
+                              className="cursor-pointer"
+                              onClick={() => toggleStatus(c.id)}
+                            >
+                              {c.status === "ativo" ? "Ativo" : "Inativo"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button variant="ghost" size="icon" onClick={() => openEdit(c)}>
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon" onClick={() => {
+                                setSelectedColabId(c.id);
+                                // switch to agenda tab programmatically
+                                const agendaTab = document.querySelector('[data-state][value="agenda"]') as HTMLElement;
+                                agendaTab?.click();
+                              }}>
+                                <Calendar className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon" onClick={() => handleDelete(c.id)}>
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* ===== TAB AGENDA ===== */}
+          <TabsContent value="agenda" className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Label className="text-sm text-muted-foreground">Colaborador:</Label>
+              <Select
+                value={selectedColabId ?? "none"}
+                onValueChange={(v) => setSelectedColabId(v === "none" ? null : v)}
+              >
+                <SelectTrigger className="w-64">
+                  <SelectValue placeholder="Selecione um colaborador" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Selecione...</SelectItem>
+                  {colaboradores
+                    .filter((c) => c.status === "ativo")
+                    .map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.nome} — {c.funcao}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {selectedColab ? (
+              <ColaboradorAgenda
+                schedule={selectedColab.horario ?? emptySchedule}
+                tasks={tasks.filter((t) => t.colaboradorId === selectedColab.id)}
+                onAddTask={() => {
+                  setEditingTask(null);
+                  setTaskDialogOpen(true);
+                }}
+                onEditTask={(t) => {
+                  setEditingTask(t);
+                  setTaskDialogOpen(true);
+                }}
+                onDeleteTask={handleDeleteTask}
+              />
+            ) : (
+              <div className="bg-card rounded-xl shadow-soft p-12 text-center">
+                <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                <h3 className="text-lg font-semibold text-foreground mb-1">
+                  Selecione um colaborador
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  Escolha um colaborador para ver sua agenda e tarefas.
+                </p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+
+        {/* Colaborador Form Dialog */}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {editingId ? "Editar Colaborador" : "Novo Colaborador"}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Observações</Label>
+                  <Label>Nome *</Label>
                   <Input
-                    value={form.observacoes}
-                    onChange={(e) =>
-                      setForm({ ...form, observacoes: e.target.value })
-                    }
-                    placeholder="Informações adicionais"
+                    value={form.nome}
+                    onChange={(e) => setForm({ ...form, nome: e.target.value })}
+                    placeholder="Nome completo"
                   />
                 </div>
-                <Button onClick={handleSave} disabled={saving}>
-                  {saving ? "Salvando..." : editingId ? "Atualizar" : "Cadastrar"}
-                </Button>
+                <div className="space-y-2">
+                  <Label>Função *</Label>
+                  <Select value={form.funcao} onValueChange={(v) => setForm({ ...form, funcao: v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {funcoes.map((f) => (
+                        <SelectItem key={f} value={f}>{f}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-            </DialogContent>
-          </Dialog>
-        </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Telefone</Label>
+                  <Input
+                    value={form.telefone}
+                    onChange={(e) => setForm({ ...form, telefone: e.target.value })}
+                    placeholder="(00) 00000-0000"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder="email@exemplo.com"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Data de Admissão</Label>
+                  <Input
+                    type="date"
+                    value={form.dataAdmissao}
+                    onChange={(e) => setForm({ ...form, dataAdmissao: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <Select
+                    value={form.status}
+                    onValueChange={(v) => setForm({ ...form, status: v as "ativo" | "inativo" })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ativo">Ativo</SelectItem>
+                      <SelectItem value="inativo">Inativo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Observações</Label>
+                <Input
+                  value={form.observacoes}
+                  onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
+                  placeholder="Informações adicionais"
+                />
+              </div>
 
-        {/* Filter */}
-        <div className="flex items-center gap-3">
-          <Label className="text-sm text-muted-foreground">Filtrar por função:</Label>
-          <Select value={filterFuncao} onValueChange={setFilterFuncao}>
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todas">Todas</SelectItem>
-              {funcoes.map((f) => (
-                <SelectItem key={f} value={f}>
-                  {f}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+              {/* Work Schedule */}
+              <div className="border-t border-border pt-4">
+                <WorkScheduleEditor
+                  schedule={form.horario}
+                  onChange={(h) => setForm({ ...form, horario: h })}
+                />
+              </div>
 
-        {/* Table */}
-        {filtered.length === 0 ? (
-          <div className="bg-card rounded-xl shadow-soft p-12 text-center">
-            <Users className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-foreground mb-1">
-              Nenhum colaborador cadastrado
-            </h3>
-            <p className="text-muted-foreground text-sm">
-              Clique em "Novo Colaborador" para começar.
-            </p>
-          </div>
-        ) : (
-          <div className="bg-card rounded-xl shadow-soft overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Função</TableHead>
-                  <TableHead className="hidden md:table-cell">Contato</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((c) => (
-                  <TableRow key={c.id}>
-                    <TableCell className="font-medium">{c.nome}</TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">{c.funcao}</Badge>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      <div className="flex flex-col gap-1 text-sm text-muted-foreground">
-                        {c.telefone && (
-                          <span className="flex items-center gap-1">
-                            <Phone className="h-3 w-3" /> {c.telefone}
-                          </span>
-                        )}
-                        {c.email && (
-                          <span className="flex items-center gap-1">
-                            <Mail className="h-3 w-3" /> {c.email}
-                          </span>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={c.status === "ativo" ? "default" : "outline"}
-                        className="cursor-pointer"
-                        onClick={() => toggleStatus(c.id)}
-                      >
-                        {c.status === "ativo" ? "Ativo" : "Inativo"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openEdit(c)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(c.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+              <Button onClick={handleSave} disabled={saving}>
+                {saving ? "Salvando..." : editingId ? "Atualizar" : "Cadastrar"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Task Dialog */}
+        {selectedColab && taskDialogOpen && (
+          <TaskDialog
+            open={taskDialogOpen}
+            onOpenChange={setTaskDialogOpen}
+            colaboradorId={selectedColab.id}
+            colaboradorNome={selectedColab.nome}
+            schedule={selectedColab.horario ?? emptySchedule}
+            existingTasks={tasks.filter((t) => t.colaboradorId === selectedColab.id)}
+            editingTask={editingTask}
+            onSave={handleSaveTask}
+          />
         )}
       </div>
     </MainLayout>
