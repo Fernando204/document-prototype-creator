@@ -17,6 +17,19 @@ export interface Horse {
   };
   notes?: string;
   isFavorite?: boolean;
+  ownerIds?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Client {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  document?: string; // CPF/CNPJ
+  address?: string;
+  notes?: string;
   createdAt: string;
   updatedAt: string;
 }

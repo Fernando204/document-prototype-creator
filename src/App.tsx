@@ -13,6 +13,7 @@ import Financeiro from "./pages/Financeiro";
 import Agenda from "./pages/Agenda";
 import Configuracoes from "./pages/Configuracoes";
 import Colaboradores from "./pages/Colaboradores";
+import Clientes from "./pages/Clientes";
 import Login from "./pages/Login";
 import Registro from "./pages/Registro";
 import NotFound from "./pages/NotFound";
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/agenda" element={<Agenda />} />
           <Route path="/configuracoes" element={<Configuracoes />} />
           <Route path="/colaboradores" element={<Colaboradores />} />
+          <Route path="/clientes" element={<Clientes />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
