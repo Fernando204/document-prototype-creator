@@ -274,6 +274,49 @@ export function HorseFormDialog({ open, onOpenChange, onSave, horse }: HorseForm
             </div>
           </div>
 
+          {/* Proprietários */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-foreground">Proprietários *</h3>
+            {clients.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nenhum cliente cadastrado. Cadastre um cliente primeiro na aba Clientes.</p>
+            ) : (
+              <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-3">
+                {clients.map((client) => (
+                  <div key={client.id} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`owner-${client.id}`}
+                      checked={selectedOwnerIds.includes(client.id)}
+                      onCheckedChange={(checked) => {
+                        setSelectedOwnerIds((prev) =>
+                          checked
+                            ? [...prev, client.id]
+                            : prev.filter((id) => id !== client.id)
+                        );
+                      }}
+                    />
+                    <Label htmlFor={`owner-${client.id}`} className="text-sm font-normal cursor-pointer">
+                      {client.name}
+                      {client.document && <span className="text-muted-foreground ml-1">({client.document})</span>}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            )}
+            {selectedOwnerIds.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {selectedOwnerIds.map((id) => {
+                  const c = clients.find((cl) => cl.id === id);
+                  return c ? (
+                    <Badge key={id} variant="secondary" className="text-xs gap-1">
+                      {c.name}
+                      <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedOwnerIds((prev) => prev.filter((oid) => oid !== id))} />
+                    </Badge>
+                  ) : null;
+                })}
+              </div>
+            )}
+          </div>
+
           {/* Notes */}
           <div className="space-y-2">
             <Label htmlFor="notes">Observações</Label>

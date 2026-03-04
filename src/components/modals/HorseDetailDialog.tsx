@@ -1,4 +1,4 @@
-import { Horse, HealthEvent, Competition, Reproduction } from "@/types";
+import { Horse, HealthEvent, Competition, Reproduction, Client } from "@/types";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,7 @@ import {
   User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 interface HorseDetailDialogProps {
   open: boolean;
@@ -43,6 +44,9 @@ export function HorseDetailDialog({
   reproductions,
 }: HorseDetailDialogProps) {
   if (!horse) return null;
+
+  const [clients] = useLocalStorage<Client[]>("horsecontrol-clients", []);
+  const owners = clients.filter((c) => (horse.ownerIds || []).includes(c.id));
 
   const config = statusConfig[horse.status];
 
