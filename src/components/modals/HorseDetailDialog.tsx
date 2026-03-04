@@ -43,9 +43,10 @@ export function HorseDetailDialog({
   competitions,
   reproductions,
 }: HorseDetailDialogProps) {
+  const [clients] = useLocalStorage<Client[]>("horsecontrol-clients", []);
+
   if (!horse) return null;
 
-  const [clients] = useLocalStorage<Client[]>("horsecontrol-clients", []);
   const owners = clients.filter((c) => (horse.ownerIds || []).includes(c.id));
 
   const config = statusConfig[horse.status];
