@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -18,10 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Horse } from "@/types";
+import { Horse, Client } from "@/types";
 import { toast } from "sonner";
 import { Camera, X, Loader2 } from "lucide-react";
 import { calculateAge } from "@/lib/calculateAge";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 interface HorseFormDialogProps {
   open: boolean;
@@ -48,6 +51,8 @@ export function HorseFormDialog({ open, onOpenChange, onSave, horse }: HorseForm
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
+  const [selectedOwnerIds, setSelectedOwnerIds] = useState<string[]>([]);
+  const [clients] = useLocalStorage<Client[]>("horsecontrol-clients", []);
 
   const isEditing = !!horse;
 
@@ -67,9 +72,11 @@ export function HorseFormDialog({ open, onOpenChange, onSave, horse }: HorseForm
         notes: horse.notes || "",
       });
       setImagePreview(horse.imageUrl || null);
+      setSelectedOwnerIds(horse.ownerIds || []);
     } else {
       setFormData(emptyForm);
       setImagePreview(null);
+      setSelectedOwnerIds([]);
     }
   }, [horse, open]);
 
@@ -106,6 +113,11 @@ export function HorseFormDialog({ open, onOpenChange, onSave, horse }: HorseForm
       return;
     }
 
+    if (selectedOwnerIds.length === 0) {
+      toast.error("Selecione ao menos um proprietário");
+      return;
+    }
+
     const birth = new Date(formData.birthDate);
     if (isNaN(birth.getTime()) || birth > new Date()) {
       toast.error("Data de nascimento inválida");
@@ -130,10 +142,12 @@ export function HorseFormDialog({ open, onOpenChange, onSave, horse }: HorseForm
         },
         notes: formData.notes,
         isFavorite: horse?.isFavorite ?? false,
+        ownerIds: selectedOwnerIds,
       });
 
       setFormData(emptyForm);
       setImagePreview(null);
+      setSelectedOwnerIds([]);
       onOpenChange(false);
       toast.success(isEditing ? "Cavalo atualizado com sucesso!" : "Cavalo cadastrado com sucesso!");
     } catch (err: any) {
