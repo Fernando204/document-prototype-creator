@@ -130,6 +130,24 @@ export function HorseDetailDialog({
           <InfoItem label="Cadastrado em" value={formatDate(horse.createdAt)} />
         </div>
 
+        {/* Proprietários */}
+        {owners.length > 0 && (
+          <div>
+            <p className="text-xs font-medium text-muted-foreground mb-2">Proprietários</p>
+            <div className="flex flex-wrap gap-2">
+              {owners.map((owner) => (
+                <div key={owner.id} className="flex items-center gap-2 bg-muted/30 rounded-lg px-3 py-2">
+                  <User className="h-3.5 w-3.5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{owner.name}</p>
+                    {owner.phone && <p className="text-xs text-muted-foreground">{owner.phone}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {horse.notes && (
           <div className="bg-muted/50 rounded-lg p-3">
             <p className="text-xs font-medium text-muted-foreground mb-1">Observações</p>
