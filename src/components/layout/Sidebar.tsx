@@ -12,8 +12,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Users,
+  UserCheck,
 } from "lucide-react";
-import logo from "@/assets/horsecontrol_logo.svg";
+import logo from "@/assets/horsecontrol_logo.png";
 import { cn } from "@/lib/utils";
 
 // Custom Horse icon since lucide doesn't have one
@@ -42,6 +43,7 @@ const menuItems = [
   { icon: Baby, label: "Reprodução", path: "/reproducao" },
   { icon: Wallet, label: "Financeiro", path: "/financeiro" },
   { icon: Users, label: "Colaboradores", path: "/colaboradores" },
+  { icon: UserCheck, label: "Clientes", path: "/clientes" },
 ];
 
 export function Sidebar() {
