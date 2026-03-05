@@ -235,6 +235,7 @@ const Index = () => {
         onOpenChange={setIsVaccineOpen}
         onSave={addEvent}
         horses={horses}
+        stock={stock}
         defaultType="vacinação"
       />
       <NewEventDialog
@@ -242,6 +243,7 @@ const Index = () => {
         onOpenChange={setIsNewEventOpen}
         onSave={addEvent}
         horses={horses}
+        stock={stock}
       />
       <ReportDialog
         open={isReportOpen}

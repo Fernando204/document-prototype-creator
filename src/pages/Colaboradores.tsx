@@ -31,6 +31,7 @@ import { toast } from "sonner";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useEvents } from "@/hooks/useEvents";
 import { useHorses } from "@/hooks/useHorses";
+import { useStock } from "@/hooks/useStock";
 import { WorkScheduleEditor, emptySchedule, type WeekSchedule } from "@/components/colaboradores/WorkScheduleEditor";
 import { ColaboradorAgenda } from "@/components/colaboradores/ColaboradorAgenda";
 import { NewEventDialog } from "@/components/modals/NewEventDialog";
@@ -326,7 +327,6 @@ const Colaboradores = () => {
           open={newEventOpen}
           onOpenChange={setNewEventOpen}
           onSave={(ev) => {
-            // Auto-assign selected collaborator
             const withColab = selectedColabId
               ? { ...ev, colaboradorIds: [...(ev.colaboradorIds ?? []), ...(!(ev.colaboradorIds ?? []).includes(selectedColabId) ? [selectedColabId] : [])] }
               : ev;
@@ -334,6 +334,7 @@ const Colaboradores = () => {
           }}
           horses={horses}
           colaboradores={colaboradores}
+          stock={stock}
         />
 
         {editingEvent && (
@@ -345,6 +346,7 @@ const Colaboradores = () => {
             onDelete={deleteEvent}
             horses={horses}
             colaboradores={colaboradores}
+            stock={stock}
           />
         )}
       </div>

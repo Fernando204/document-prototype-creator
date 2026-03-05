@@ -1,6 +1,7 @@
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useEvents } from "@/hooks/useEvents";
 import { useHorses } from "@/hooks/useHorses";
+import { useStock } from "@/hooks/useStock";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -166,6 +167,7 @@ const Saude = () => {
         onSave={addEvent}
         horses={horses}
         colaboradores={colaboradores}
+        stock={stock}
       />
     </MainLayout>
   );
