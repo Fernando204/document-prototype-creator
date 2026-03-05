@@ -5,24 +5,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { HealthEvent, Horse } from "@/types";
+import { HealthEvent, Horse, EventStockItem, StockItem } from "@/types";
 import { toast } from "sonner";
 import { Users, X, CheckSquare } from "lucide-react";
+import { EventStockSelector } from "./EventStockSelector";
 
 interface Colaborador {
   id: string;
@@ -39,6 +31,7 @@ interface EditEventDialogProps {
   onDelete: (id: string) => void;
   horses: Horse[];
   colaboradores: Colaborador[];
+  stock?: StockItem[];
 }
 
 export function EditEventDialog({
@@ -49,6 +42,7 @@ export function EditEventDialog({
   onDelete,
   horses,
   colaboradores,
+  stock = [],
 }: EditEventDialogProps) {
   const [form, setForm] = useState({
     horseIds: event.horseIds ?? [],
@@ -62,6 +56,7 @@ export function EditEventDialog({
     veterinarian: event.veterinarian ?? "",
     cost: event.cost?.toString() ?? "",
     colaboradorIds: event.colaboradorIds ?? [] as string[],
+    stockItems: event.stockItems ?? [] as EventStockItem[],
   });
 
   useEffect(() => {
@@ -77,15 +72,14 @@ export function EditEventDialog({
       veterinarian: event.veterinarian ?? "",
       cost: event.cost?.toString() ?? "",
       colaboradorIds: event.colaboradorIds ?? [],
+      stockItems: event.stockItems ?? [],
     });
   }, [event]);
 
   const toggleHorse = (id: string) => {
     setForm((prev) => ({
       ...prev,
-      horseIds: prev.horseIds.includes(id)
-        ? prev.horseIds.filter((h) => h !== id)
-        : [...prev.horseIds, id],
+      horseIds: prev.horseIds.includes(id) ? prev.horseIds.filter((h) => h !== id) : [...prev.horseIds, id],
     }));
   };
 
@@ -99,9 +93,7 @@ export function EditEventDialog({
   const toggleColaborador = (id: string) => {
     setForm((prev) => ({
       ...prev,
-      colaboradorIds: prev.colaboradorIds.includes(id)
-        ? prev.colaboradorIds.filter((c) => c !== id)
-        : [...prev.colaboradorIds, id],
+      colaboradorIds: prev.colaboradorIds.includes(id) ? prev.colaboradorIds.filter((c) => c !== id) : [...prev.colaboradorIds, id],
     }));
   };
 
@@ -122,6 +114,7 @@ export function EditEventDialog({
       veterinarian: form.veterinarian || undefined,
       cost: form.cost ? parseFloat(form.cost) : undefined,
       colaboradorIds: form.colaboradorIds.length > 0 ? form.colaboradorIds : undefined,
+      stockItems: form.stockItems.length > 0 ? form.stockItems : undefined,
     });
     onOpenChange(false);
     toast.success("Evento atualizado!");
@@ -134,6 +127,16 @@ export function EditEventDialog({
   };
 
   const activeColabs = colaboradores.filter((c) => c.status === "ativo");
+
+  // For stock selector, we need to account for current event's own reservations
+  // so user can see the correct available quantity
+  const adjustedStock = stock.map((s) => {
+    const currentReservation = event.stockItems?.find((si) => si.stockItemId === s.id);
+    if (currentReservation && event.status === "agendado") {
+      return { ...s, reservedQuantity: s.reservedQuantity - currentReservation.quantity };
+    }
+    return s;
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -160,9 +163,7 @@ export function EditEventDialog({
                   return (
                     <Badge key={hId} variant="secondary" className="gap-1">
                       {h?.name ?? "?"}
-                      <button type="button" onClick={() => toggleHorse(hId)}>
-                        <X className="h-3 w-3" />
-                      </button>
+                      <button type="button" onClick={() => toggleHorse(hId)}><X className="h-3 w-3" /></button>
                     </Badge>
                   );
                 })}
@@ -242,6 +243,13 @@ export function EditEventDialog({
             <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} />
           </div>
 
+          {/* Stock items */}
+          <EventStockSelector
+            stock={adjustedStock}
+            selectedItems={form.stockItems}
+            onChange={(items) => setForm({ ...form, stockItems: items })}
+          />
+
           {/* Collaborator assignment */}
           <div className="space-y-2 border-t border-border pt-4">
             <Label className="flex items-center gap-2">
@@ -254,9 +262,7 @@ export function EditEventDialog({
                   return (
                     <Badge key={cId} variant="secondary" className="gap-1">
                       {c?.nome ?? "?"}
-                      <button onClick={() => toggleColaborador(cId)}>
-                        <X className="h-3 w-3" />
-                      </button>
+                      <button onClick={() => toggleColaborador(cId)}><X className="h-3 w-3" /></button>
                     </Badge>
                   );
                 })}
@@ -268,10 +274,7 @@ export function EditEventDialog({
               ) : (
                 activeColabs.map((c) => (
                   <label key={c.id} className="flex items-center gap-2 p-1 rounded hover:bg-muted cursor-pointer text-sm">
-                    <Checkbox
-                      checked={form.colaboradorIds.includes(c.id)}
-                      onCheckedChange={() => toggleColaborador(c.id)}
-                    />
+                    <Checkbox checked={form.colaboradorIds.includes(c.id)} onCheckedChange={() => toggleColaborador(c.id)} />
                     <span>{c.nome}</span>
                     <span className="text-xs text-muted-foreground">({c.funcao})</span>
                   </label>
@@ -282,9 +285,7 @@ export function EditEventDialog({
         </div>
 
         <DialogFooter className="flex-col sm:flex-row gap-2">
-          <Button variant="destructive" onClick={handleDelete} className="sm:mr-auto">
-            Excluir
-          </Button>
+          <Button variant="destructive" onClick={handleDelete} className="sm:mr-auto">Excluir</Button>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
           <Button onClick={handleSave}>Salvar Alterações</Button>
         </DialogFooter>
