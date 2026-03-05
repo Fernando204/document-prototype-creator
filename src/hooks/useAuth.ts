@@ -1,6 +1,6 @@
 import { useLocalStorage } from "./useLocalStorage";
 import { useCallback } from "react";
-import { registerUser } from "@./../services/api";
+import { registerUser } from "@/services/api";
 
 export interface User {
   id: string;
@@ -30,8 +30,10 @@ export function useAuth() {
       try {
         const response = await registerUser({
           name,
+          phone,
           email,
           password,
+          harasName,
         });
 
         const user: User = response.user;
