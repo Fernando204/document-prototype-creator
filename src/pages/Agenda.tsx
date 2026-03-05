@@ -1,6 +1,7 @@
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useEvents } from "@/hooks/useEvents";
 import { useHorses } from "@/hooks/useHorses";
+import { useStock } from "@/hooks/useStock";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,6 +50,7 @@ interface Colaborador {
 const Agenda = () => {
   const { events, addEvent, updateEvent, deleteEvent } = useEvents();
   const { horses } = useHorses();
+  const { stock } = useStock();
   const [colaboradores] = useLocalStorage<Colaborador[]>("horsecontrol-colaboradores", []);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [isNewEventOpen, setIsNewEventOpen] = useState(false);
@@ -364,6 +366,7 @@ const Agenda = () => {
         onSave={addEvent}
         horses={horses}
         colaboradores={colaboradores}
+        stock={stock}
       />
 
       {editingEvent && (
@@ -375,6 +378,7 @@ const Agenda = () => {
           onDelete={deleteEvent}
           horses={horses}
           colaboradores={colaboradores}
+          stock={stock}
         />
       )}
     </MainLayout>

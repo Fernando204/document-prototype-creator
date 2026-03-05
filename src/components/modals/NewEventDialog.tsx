@@ -5,24 +5,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { HealthEvent, Horse } from "@/types";
+import { HealthEvent, Horse, EventStockItem, StockItem } from "@/types";
 import { toast } from "sonner";
 import { Users, X, CheckSquare } from "lucide-react";
+import { EventStockSelector } from "./EventStockSelector";
 
 interface Colaborador {
   id: string;
@@ -37,6 +29,7 @@ interface NewEventDialogProps {
   onSave: (event: Omit<HealthEvent, "id" | "createdAt">) => void;
   horses: Horse[];
   colaboradores?: Colaborador[];
+  stock?: StockItem[];
   defaultType?: HealthEvent["type"];
 }
 
@@ -46,6 +39,7 @@ export function NewEventDialog({
   onSave,
   horses,
   colaboradores = [],
+  stock = [],
   defaultType = "veterinário",
 }: NewEventDialogProps) {
   const [formData, setFormData] = useState({
@@ -59,14 +53,13 @@ export function NewEventDialog({
     veterinarian: "",
     cost: "",
     colaboradorIds: [] as string[],
+    stockItems: [] as EventStockItem[],
   });
 
   const toggleHorse = (id: string) => {
     setFormData((prev) => ({
       ...prev,
-      horseIds: prev.horseIds.includes(id)
-        ? prev.horseIds.filter((h) => h !== id)
-        : [...prev.horseIds, id],
+      horseIds: prev.horseIds.includes(id) ? prev.horseIds.filter((h) => h !== id) : [...prev.horseIds, id],
     }));
   };
 
@@ -80,15 +73,12 @@ export function NewEventDialog({
   const toggleColaborador = (id: string) => {
     setFormData((prev) => ({
       ...prev,
-      colaboradorIds: prev.colaboradorIds.includes(id)
-        ? prev.colaboradorIds.filter((c) => c !== id)
-        : [...prev.colaboradorIds, id],
+      colaboradorIds: prev.colaboradorIds.includes(id) ? prev.colaboradorIds.filter((c) => c !== id) : [...prev.colaboradorIds, id],
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (formData.horseIds.length === 0 || !formData.title.trim() || !formData.date) {
       toast.error("Selecione ao menos um cavalo, título e data são obrigatórios");
       return;
@@ -106,6 +96,7 @@ export function NewEventDialog({
       veterinarian: formData.veterinarian,
       cost: formData.cost ? parseFloat(formData.cost) : undefined,
       colaboradorIds: formData.colaboradorIds.length > 0 ? formData.colaboradorIds : undefined,
+      stockItems: formData.stockItems.length > 0 ? formData.stockItems : undefined,
     });
 
     setFormData({
@@ -119,6 +110,7 @@ export function NewEventDialog({
       veterinarian: "",
       cost: "",
       colaboradorIds: [],
+      stockItems: [],
     });
 
     onOpenChange(false);
@@ -152,9 +144,7 @@ export function NewEventDialog({
                   return (
                     <Badge key={hId} variant="secondary" className="gap-1">
                       {h?.name ?? "?"}
-                      <button type="button" onClick={() => toggleHorse(hId)}>
-                        <X className="h-3 w-3" />
-                      </button>
+                      <button type="button" onClick={() => toggleHorse(hId)}><X className="h-3 w-3" /></button>
                     </Badge>
                   );
                 })}
@@ -222,6 +212,13 @@ export function NewEventDialog({
             <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Observações sobre o evento..." rows={2} />
           </div>
 
+          {/* Stock items */}
+          <EventStockSelector
+            stock={stock}
+            selectedItems={formData.stockItems}
+            onChange={(items) => setFormData({ ...formData, stockItems: items })}
+          />
+
           {/* Collaborator assignment */}
           {activeColabs.length > 0 && (
             <div className="space-y-2 border-t border-border pt-4">
@@ -235,9 +232,7 @@ export function NewEventDialog({
                     return (
                       <Badge key={cId} variant="secondary" className="gap-1">
                         {c?.nome ?? "?"}
-                        <button type="button" onClick={() => toggleColaborador(cId)}>
-                          <X className="h-3 w-3" />
-                        </button>
+                        <button type="button" onClick={() => toggleColaborador(cId)}><X className="h-3 w-3" /></button>
                       </Badge>
                     );
                   })}
@@ -246,10 +241,7 @@ export function NewEventDialog({
               <div className="max-h-32 overflow-y-auto space-y-1 rounded-md border border-border p-2">
                 {activeColabs.map((c) => (
                   <label key={c.id} className="flex items-center gap-2 p-1 rounded hover:bg-muted cursor-pointer text-sm">
-                    <Checkbox
-                      checked={formData.colaboradorIds.includes(c.id)}
-                      onCheckedChange={() => toggleColaborador(c.id)}
-                    />
+                    <Checkbox checked={formData.colaboradorIds.includes(c.id)} onCheckedChange={() => toggleColaborador(c.id)} />
                     <span>{c.nome}</span>
                     <span className="text-xs text-muted-foreground">({c.funcao})</span>
                   </label>

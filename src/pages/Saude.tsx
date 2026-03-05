@@ -1,6 +1,7 @@
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useEvents } from "@/hooks/useEvents";
 import { useHorses } from "@/hooks/useHorses";
+import { useStock } from "@/hooks/useStock";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ interface Colaborador {
 const Saude = () => {
   const { events, addEvent, completeEvent, deleteEvent } = useEvents();
   const { horses } = useHorses();
+  const { stock } = useStock();
   const [colaboradores] = useLocalStorage<Colaborador[]>("horsecontrol-colaboradores", []);
   const [isNewEventOpen, setIsNewEventOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -166,6 +168,7 @@ const Saude = () => {
         onSave={addEvent}
         horses={horses}
         colaboradores={colaboradores}
+        stock={stock}
       />
     </MainLayout>
   );

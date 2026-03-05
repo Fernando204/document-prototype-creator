@@ -6,9 +6,9 @@ import { financeService } from "./financeService";
 const STORAGE_KEY = "horsecontrol-stock";
 
 const initialStock: StockItem[] = [
-  { id: "1", name: "Vermífugo Equino", category: "medicamento", quantity: 3, unit: "doses", minQuantity: 5, expirationDate: "2025-06-15", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-  { id: "2", name: "Ração Premium", category: "ração", quantity: 50, unit: "kg", minQuantity: 100, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-  { id: "3", name: "Suplemento Vitamínico", category: "suplemento", quantity: 2, unit: "frascos", minQuantity: 3, expirationDate: "2025-12-01", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "1", name: "Vermífugo Equino", category: "medicamento", quantity: 3, reservedQuantity: 0, unit: "doses", minQuantity: 5, expirationDate: "2025-06-15", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "2", name: "Ração Premium", category: "ração", quantity: 50, reservedQuantity: 0, unit: "kg", minQuantity: 100, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: "3", name: "Suplemento Vitamínico", category: "suplemento", quantity: 2, reservedQuantity: 0, unit: "frascos", minQuantity: 3, expirationDate: "2025-12-01", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 ];
 
 function getStock(): StockItem[] {
@@ -29,6 +29,7 @@ export const stockService = {
       const stock = getStock();
       const newItem: StockItem = {
         ...dto,
+        reservedQuantity: 0,
         id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -70,9 +71,6 @@ export const stockService = {
     });
   },
 
-  /**
-   * Purchase or sell stock with automatic finance integration
-   */
   async operate(op: StockOperation): Promise<{ item: StockItem }> {
     const stock = getStock();
     const index = stock.findIndex((s) => s.id === op.stockItemId);
@@ -84,11 +82,9 @@ export const stockService = {
 
     if (newQuantity < 0) throw new Error("Quantidade insuficiente em estoque");
 
-    // Update stock
     stock[index] = { ...item, quantity: newQuantity, updatedAt: new Date().toISOString() };
     saveStock(stock);
 
-    // Create finance transaction
     const totalValue = op.quantity * op.unitPrice;
     await financeService.create({
       type: op.type === "compra" ? "despesa" : "receita",
