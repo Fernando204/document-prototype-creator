@@ -8,6 +8,7 @@ export interface User {
   email: string;
   phone?: string;
   farm?: string;
+  farmName: string;
   avatar?: string;
   createdAt: string;
 }
