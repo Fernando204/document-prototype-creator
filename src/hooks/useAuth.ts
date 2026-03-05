@@ -1,6 +1,6 @@
 import { useLocalStorage } from "./useLocalStorage";
 import { useCallback } from "react";
-import { registerUser } from "@/services/api";
+import { registerUser, loginUser as loginUserApi } from "@/services/api";
 
 export interface User {
   id: string;
@@ -50,21 +50,18 @@ export function useAuth() {
   );
 
   const login = useCallback(
-    (email: string, password: string) => {
-      const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
-      if (!user) {
-        return { success: false, error: "E-mail ou senha incorretos." };
-      }
+    async (email: string, password: string) => {
+      try {
+        const response = await loginUserApi({ email, password });
+        const user: User = response;
 
-      const passwords = JSON.parse(localStorage.getItem("hc_passwords") || "{}");
-      if (passwords[user.id] !== btoa(password)) {
-        return { success: false, error: "E-mail ou senha incorretos." };
+        setAuth({ user, isAuthenticated: true });
+        return { success: true };
+      } catch (error: any) {
+        return { success: false, error: error.message || "E-mail ou senha incorretos." };
       }
-
-      setAuth({ user, isAuthenticated: true });
-      return { success: true };
     },
-    [users, setAuth],
+    [setAuth],
   );
 
   const logout = useCallback(() => {
