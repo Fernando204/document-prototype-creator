@@ -30,8 +30,10 @@ export function useAuth() {
       try {
         const response = await registerUser({
           name,
+          phone,
           email,
           password,
+          harasName,
         });
 
         const user: User = response.user;
