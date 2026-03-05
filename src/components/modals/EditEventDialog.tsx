@@ -22,7 +22,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { HealthEvent, Horse } from "@/types";
 import { toast } from "sonner";
-import { Users, X } from "lucide-react";
+import { Users, X, CheckSquare } from "lucide-react";
 
 interface Colaborador {
   id: string;
@@ -51,7 +51,7 @@ export function EditEventDialog({
   colaboradores,
 }: EditEventDialogProps) {
   const [form, setForm] = useState({
-    horseId: event.horseId,
+    horseIds: event.horseIds ?? [],
     type: event.type,
     title: event.title,
     description: event.description ?? "",
@@ -66,7 +66,7 @@ export function EditEventDialog({
 
   useEffect(() => {
     setForm({
-      horseId: event.horseId,
+      horseIds: event.horseIds ?? [],
       type: event.type,
       title: event.title,
       description: event.description ?? "",
@@ -80,6 +80,22 @@ export function EditEventDialog({
     });
   }, [event]);
 
+  const toggleHorse = (id: string) => {
+    setForm((prev) => ({
+      ...prev,
+      horseIds: prev.horseIds.includes(id)
+        ? prev.horseIds.filter((h) => h !== id)
+        : [...prev.horseIds, id],
+    }));
+  };
+
+  const selectAllHorses = () => {
+    setForm((prev) => ({
+      ...prev,
+      horseIds: prev.horseIds.length === horses.length ? [] : horses.map((h) => h.id),
+    }));
+  };
+
   const toggleColaborador = (id: string) => {
     setForm((prev) => ({
       ...prev,
@@ -90,12 +106,12 @@ export function EditEventDialog({
   };
 
   const handleSave = () => {
-    if (!form.title.trim() || !form.date) {
-      toast.error("Título e data são obrigatórios.");
+    if (form.horseIds.length === 0 || !form.title.trim() || !form.date) {
+      toast.error("Selecione ao menos um cavalo, título e data são obrigatórios.");
       return;
     }
     onSave(event.id, {
-      horseId: form.horseId,
+      horseIds: form.horseIds,
       type: form.type as HealthEvent["type"],
       title: form.title,
       description: form.description || undefined,
@@ -128,32 +144,54 @@ export function EditEventDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Cavalo *</Label>
-              <Select value={form.horseId} onValueChange={(v) => setForm({ ...form, horseId: v })}>
-                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent>
-                  {horses.map((h) => (
-                    <SelectItem key={h.id} value={h.id}>{h.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          {/* Horse selection */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label>Cavalos *</Label>
+              <Button type="button" variant="ghost" size="sm" className="h-7 text-xs gap-1" onClick={selectAllHorses}>
+                <CheckSquare className="h-3 w-3" />
+                {form.horseIds.length === horses.length ? "Desmarcar todos" : "Selecionar todos"}
+              </Button>
             </div>
-            <div className="space-y-2">
-              <Label>Tipo</Label>
-              <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v as HealthEvent["type"] })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="vacinação">Vacinação</SelectItem>
-                  <SelectItem value="vermifugação">Vermifugação</SelectItem>
-                  <SelectItem value="ferrageamento">Ferrageamento</SelectItem>
-                  <SelectItem value="veterinário">Veterinário</SelectItem>
-                  <SelectItem value="medicamento">Medicamento</SelectItem>
-                  <SelectItem value="outro">Outro</SelectItem>
-                </SelectContent>
-              </Select>
+            {form.horseIds.length > 0 && (
+              <div className="flex flex-wrap gap-1 mb-1">
+                {form.horseIds.map((hId) => {
+                  const h = horses.find((horse) => horse.id === hId);
+                  return (
+                    <Badge key={hId} variant="secondary" className="gap-1">
+                      {h?.name ?? "?"}
+                      <button type="button" onClick={() => toggleHorse(hId)}>
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  );
+                })}
+              </div>
+            )}
+            <div className="max-h-32 overflow-y-auto space-y-1 rounded-md border border-border p-2">
+              {horses.map((h) => (
+                <label key={h.id} className="flex items-center gap-2 p-1 rounded hover:bg-muted cursor-pointer text-sm">
+                  <Checkbox checked={form.horseIds.includes(h.id)} onCheckedChange={() => toggleHorse(h.id)} />
+                  <span>{h.name}</span>
+                  <span className="text-xs text-muted-foreground">({h.breed})</span>
+                </label>
+              ))}
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Tipo</Label>
+            <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v as HealthEvent["type"] })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="vacinação">Vacinação</SelectItem>
+                <SelectItem value="vermifugação">Vermifugação</SelectItem>
+                <SelectItem value="ferrageamento">Ferrageamento</SelectItem>
+                <SelectItem value="veterinário">Veterinário</SelectItem>
+                <SelectItem value="medicamento">Medicamento</SelectItem>
+                <SelectItem value="outro">Outro</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

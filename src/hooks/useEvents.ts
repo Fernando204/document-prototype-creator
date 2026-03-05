@@ -5,7 +5,7 @@ import { useCallback } from "react";
 const initialEvents: HealthEvent[] = [
   {
     id: "1",
-    horseId: "1",
+    horseIds: ["1"],
     type: "vacinação",
     title: "Vacina Raiva",
     date: new Date().toISOString().split("T")[0],
@@ -15,7 +15,7 @@ const initialEvents: HealthEvent[] = [
   },
   {
     id: "2",
-    horseId: "2",
+    horseIds: ["2"],
     type: "ferrageamento",
     title: "Troca de Ferraduras",
     date: new Date(Date.now() + 86400000).toISOString().split("T")[0],
@@ -25,7 +25,7 @@ const initialEvents: HealthEvent[] = [
   },
   {
     id: "3",
-    horseId: "3",
+    horseIds: ["3"],
     type: "veterinário",
     title: "Check-up Geral",
     date: new Date(Date.now() + 3 * 86400000).toISOString().split("T")[0],
@@ -35,7 +35,7 @@ const initialEvents: HealthEvent[] = [
   },
   {
     id: "4",
-    horseId: "4",
+    horseIds: ["4"],
     type: "vermifugação",
     title: "Vermifugação",
     date: new Date(Date.now() + 5 * 86400000).toISOString().split("T")[0],
@@ -45,8 +45,20 @@ const initialEvents: HealthEvent[] = [
   },
 ];
 
+// Migration helper: convert old horseId to horseIds
+function migrateEvents(events: any[]): HealthEvent[] {
+  return events.map((e) => {
+    if (e.horseId && !e.horseIds) {
+      const { horseId, ...rest } = e;
+      return { ...rest, horseIds: [horseId] };
+    }
+    return e;
+  });
+}
+
 export function useEvents() {
-  const [events, setEvents] = useLocalStorage<HealthEvent[]>("horsecontrol-events", initialEvents);
+  const [rawEvents, setEvents] = useLocalStorage<HealthEvent[]>("horsecontrol-events", initialEvents);
+  const events = migrateEvents(rawEvents);
 
   const addEvent = useCallback((event: Omit<HealthEvent, "id" | "createdAt">) => {
     const newEvent: HealthEvent = {
@@ -54,23 +66,23 @@ export function useEvents() {
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
     };
-    setEvents((prev) => [...prev, newEvent]);
+    setEvents((prev) => [...migrateEvents(prev), newEvent]);
     return newEvent;
   }, [setEvents]);
 
   const updateEvent = useCallback((id: string, updates: Partial<HealthEvent>) => {
     setEvents((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, ...updates } : e))
+      migrateEvents(prev).map((e) => (e.id === id ? { ...e, ...updates } : e))
     );
   }, [setEvents]);
 
   const deleteEvent = useCallback((id: string) => {
-    setEvents((prev) => prev.filter((e) => e.id !== id));
+    setEvents((prev) => migrateEvents(prev).filter((e) => e.id !== id));
   }, [setEvents]);
 
   const completeEvent = useCallback((id: string) => {
     setEvents((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, status: "concluído" as const } : e))
+      migrateEvents(prev).map((e) => (e.id === id ? { ...e, status: "concluído" as const } : e))
     );
   }, [setEvents]);
 
@@ -83,7 +95,7 @@ export function useEvents() {
   }, [events]);
 
   const getEventsByHorse = useCallback((horseId: string) => {
-    return events.filter((e) => e.horseId === horseId);
+    return events.filter((e) => e.horseIds.includes(horseId));
   }, [events]);
 
   return {

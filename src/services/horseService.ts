@@ -76,9 +76,12 @@ export const horseService = {
       const horses = getHorses();
       saveHorses(horses.filter((h) => h.id !== id));
       
-      // Cascade: events
+      // Cascade: events – remove horse from horseIds, delete event if no horses left
       const events = getStorageData("horsecontrol-events", []) as any[];
-      setStorageData("horsecontrol-events", events.filter((e: any) => e.horseId !== id));
+      const updatedEvents = events
+        .map((e: any) => ({ ...e, horseIds: (e.horseIds ?? [e.horseId]).filter((hId: string) => hId !== id) }))
+        .filter((e: any) => e.horseIds.length > 0);
+      setStorageData("horsecontrol-events", updatedEvents);
       
       // Cascade: reproductions
       const repros = getStorageData("horsecontrol-reproductions", []) as any[];

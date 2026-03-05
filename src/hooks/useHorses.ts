@@ -56,7 +56,7 @@ export function useHorses() {
 
   const deleteHorse = useCallback((id: string) => {
     const horse = horses.find((h) => h.id === id);
-    setEvents((prev) => prev.filter((e) => e.horseId !== id));
+    setEvents((prev) => prev.map((e) => ({ ...e, horseIds: (e.horseIds ?? []).filter((hId) => hId !== id) })).filter((e) => e.horseIds.length > 0));
     setReproductions((prev) => prev.filter((r) => r.mareId !== id && r.stallionId !== id));
     setCompetitions((prev) =>
       prev.map((c) => ({ ...c, horses: c.horses.filter((h) => h.horseId !== id) })).filter((c) => c.horses.length > 0)

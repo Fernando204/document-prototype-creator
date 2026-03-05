@@ -62,12 +62,12 @@ export function ReportDialog({ open, onOpenChange, horses, events }: ReportDialo
     if (reportType === "health" || reportType === "full") {
       content += "\n💉 HISTÓRICO DE SAÚDE\n" + "-".repeat(30) + "\n\n";
       const filteredEvents = events.filter(e => 
-        selectedHorse === "all" || e.horseId === selectedHorse
+        selectedHorse === "all" || (e.horseIds ?? []).includes(selectedHorse)
       );
       
       filteredEvents.forEach(event => {
-        const horse = horses.find(h => h.id === event.horseId);
-        content += `Cavalo: ${horse?.name || "N/A"}\n`;
+        const horseNames = (event.horseIds ?? []).map(id => horses.find(h => h.id === id)?.name).filter(Boolean).join(", ");
+        content += `Cavalo(s): ${horseNames || "N/A"}\n`;
         content += `Tipo: ${event.type}\n`;
         content += `Evento: ${event.title}\n`;
         content += `Data: ${format(new Date(event.date), "dd/MM/yyyy")}\n`;
@@ -82,13 +82,13 @@ export function ReportDialog({ open, onOpenChange, horses, events }: ReportDialo
       content += "\n📅 EVENTOS AGENDADOS\n" + "-".repeat(30) + "\n\n";
       const upcomingEvents = events
         .filter(e => e.status === "agendado")
-        .filter(e => selectedHorse === "all" || e.horseId === selectedHorse)
+        .filter(e => selectedHorse === "all" || (e.horseIds ?? []).includes(selectedHorse))
         .sort((a, b) => a.date.localeCompare(b.date));
       
       upcomingEvents.forEach(event => {
-        const horse = horses.find(h => h.id === event.horseId);
+        const horseNames = (event.horseIds ?? []).map(id => horses.find(h => h.id === id)?.name).filter(Boolean).join(", ");
         content += `${format(new Date(event.date), "dd/MM/yyyy")} ${event.time || ""} - ${event.title}\n`;
-        content += `  Cavalo: ${horse?.name || "N/A"} | Tipo: ${event.type}\n\n`;
+        content += `  Cavalo(s): ${horseNames || "N/A"} | Tipo: ${event.type}\n\n`;
       });
     }
 

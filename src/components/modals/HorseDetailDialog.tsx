@@ -52,7 +52,7 @@ export function HorseDetailDialog({
   const config = statusConfig[horse.status];
 
   const horseEvents = events
-    .filter((e) => e.horseId === horse.id)
+    .filter((e) => e.horseIds?.includes(horse.id))
     .sort((a, b) => b.date.localeCompare(a.date));
 
   const horseCompetitions = competitions

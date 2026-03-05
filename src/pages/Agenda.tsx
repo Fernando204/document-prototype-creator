@@ -102,6 +102,9 @@ const Agenda = () => {
 
   const getColabName = (id: string) => colaboradores.find((c) => c.id === id)?.nome ?? "?";
 
+  const getHorseNames = (horseIds: string[]) =>
+    horseIds.map((id) => horses.find((h) => h.id === id)?.name).filter(Boolean).join(", ") || "Cavalo não encontrado";
+
   const filteredEvents = events.filter((event) => {
     const matchesStatus = filterStatus === "all" || event.status === filterStatus;
     const matchesType = filterType === "all" || event.type === filterType;
@@ -138,20 +141,13 @@ const Agenda = () => {
     updateEvent(eventId, { status: "cancelado" });
   };
 
-  const getHorseName = (horseId: string) => {
-    return horses.find((h) => h.id === horseId)?.name || "Cavalo não encontrado";
-  };
-
   return (
     <MainLayout>
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Agenda</h1>
-            <p className="text-muted-foreground">
-              Gerencie todos os eventos e compromissos
-            </p>
+            <p className="text-muted-foreground">Gerencie todos os eventos e compromissos</p>
           </div>
           <Button onClick={() => setIsNewEventOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
@@ -159,12 +155,9 @@ const Agenda = () => {
           </Button>
         </div>
 
-        {/* Filters */}
         <div className="flex flex-wrap gap-4">
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
+            <SelectTrigger className="w-[150px]"><SelectValue placeholder="Status" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos Status</SelectItem>
               <SelectItem value="agendado">Agendado</SelectItem>
@@ -173,9 +166,7 @@ const Agenda = () => {
             </SelectContent>
           </Select>
           <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Tipo" />
-            </SelectTrigger>
+            <SelectTrigger className="w-[150px]"><SelectValue placeholder="Tipo" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos Tipos</SelectItem>
               <SelectItem value="vacinação">Vacinação</SelectItem>
@@ -188,7 +179,6 @@ const Agenda = () => {
           </Select>
         </div>
 
-        {/* Alerts */}
         {overdueEvents.length > 0 && (
           <Card className="border-destructive bg-destructive/5">
             <CardHeader className="pb-2">
@@ -204,16 +194,12 @@ const Agenda = () => {
                     <div>
                       <p className="font-medium text-sm">{event.title}</p>
                       <p className="text-xs text-muted-foreground">
-                        {getHorseName(event.horseId)} • {format(parseISO(event.date), "dd/MM/yyyy")}
+                        {getHorseNames(event.horseIds)} • {format(parseISO(event.date), "dd/MM/yyyy")}
                       </p>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => handleMarkComplete(event.id)}>
-                        Concluir
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => setEditingEvent(event)}>
-                        Editar
-                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => handleMarkComplete(event.id)}>Concluir</Button>
+                      <Button size="sm" variant="ghost" onClick={() => setEditingEvent(event)}>Editar</Button>
                     </div>
                   </div>
                 ))}
@@ -222,9 +208,7 @@ const Agenda = () => {
           </Card>
         )}
 
-        {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Calendar */}
           <Card className="lg:col-span-1">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -251,7 +235,6 @@ const Agenda = () => {
             </CardContent>
           </Card>
 
-          {/* Events for Selected Date */}
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle>
@@ -288,13 +271,11 @@ const Agenda = () => {
                             <div>
                               <h4 className="font-medium">{event.title}</h4>
                               <p className="text-sm text-muted-foreground">
-                                {getHorseName(event.horseId)}
+                                {getHorseNames(event.horseIds)}
                                 {event.time && ` • ${event.time}`}
                                 {event.endTime && `–${event.endTime}`}
                               </p>
-                              {event.description && (
-                                <p className="text-sm mt-1">{event.description}</p>
-                              )}
+                              {event.description && <p className="text-sm mt-1">{event.description}</p>}
                               {event.colaboradorIds && event.colaboradorIds.length > 0 && (
                                 <div className="flex items-center gap-1 mt-1 flex-wrap">
                                   <Users className="h-3 w-3 text-muted-foreground" />
@@ -332,16 +313,13 @@ const Agenda = () => {
           </Card>
         </div>
 
-        {/* Upcoming Events */}
         <Card>
           <CardHeader>
             <CardTitle>Próximos 7 Dias</CardTitle>
           </CardHeader>
           <CardContent>
             {upcomingEvents.length === 0 ? (
-              <p className="text-muted-foreground text-center py-4">
-                Nenhum evento agendado para os próximos dias
-              </p>
+              <p className="text-muted-foreground text-center py-4">Nenhum evento agendado para os próximos dias</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {upcomingEvents.map((event) => {
@@ -357,9 +335,7 @@ const Agenda = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm truncate">{event.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {getHorseName(event.horseId)}
-                        </p>
+                        <p className="text-xs text-muted-foreground">{getHorseNames(event.horseIds)}</p>
                         {event.colaboradorIds && event.colaboradorIds.length > 0 && (
                           <div className="flex items-center gap-1 mt-0.5">
                             <Users className="h-2.5 w-2.5 text-muted-foreground" />

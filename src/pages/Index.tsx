@@ -56,7 +56,7 @@ const Index = () => {
 
   const getNextEvent = (horseId: string) => {
     const horseEvents = events
-      .filter((e) => e.horseId === horseId && e.status === "agendado")
+      .filter((e) => (e.horseIds ?? []).includes(horseId) && e.status === "agendado")
       .sort((a, b) => a.date.localeCompare(b.date))[0];
 
     if (!horseEvents) return undefined;

@@ -78,7 +78,7 @@ export function NotificationPanel() {
         .filter((e) => e.status === "agendado")
         .forEach((event) => {
           const eventDate = new Date(event.date);
-          const horse = horses.find((h) => h.id === event.horseId);
+          const horse = horses.find((h) => (event.horseIds ?? []).includes(h.id));
           const uniqueId = `event-${event.id}`;
 
           if (isToday(eventDate) && !notifications.some((n) => n.title.includes(event.title) && isToday(new Date(n.createdAt)))) {
