@@ -24,7 +24,7 @@ export function useAuth() {
   });
 
   const register = useCallback(
-    (name: string, email: string, password: string) => {
+    (name: string,phone: string; email: string, password: string) => {
       const exists = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
       if (exists) {
         return { success: false, error: "Este e-mail já está cadastrado." };

@@ -43,7 +43,7 @@ export function setStorageData<T>(key: string, data: T): void {
   localStorage.setItem(key, JSON.stringify(data));
 }
 
-const API_URL = "http://localhost:8080/auth/register";
+const API_URL = "http://localhost:8080";
 
 export async function registerUser(data: {
   name: string;
