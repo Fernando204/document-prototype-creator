@@ -1,5 +1,6 @@
 import { useLocalStorage } from "./useLocalStorage";
 import { useCallback } from "react";
+import {api} from "@services/api"
 
 export interface User {
   id: string;
@@ -17,6 +18,7 @@ interface AuthState {
 }
 
 export function useAuth() {
+  const (registerUser) = api;
   const [users, setUsers] = useLocalStorage<User[]>("hc_users", []);
   const [auth, setAuth] = useLocalStorage<AuthState>("hc_auth", {
     user: null,
@@ -24,27 +26,25 @@ export function useAuth() {
   });
 
   const register = useCallback(
-    (name: string,phone: string; email: string, password: string) => {
-      const exists = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
-      if (exists) {
-        return { success: false, error: "Este e-mail já está cadastrado." };
+    async (name: string,phone: string, email: string, password: string,harasName: string) => {
+      
+      try {
+        
+        const response = await registerUser({
+          name,
+          email,
+          password,
+        });
+
+        const user: User = response.user;
+
+        setUsers([...users, user]);
+        setAuth({ user, isAuthenticated: true });
+
+        return { success: true };
+      } catch (error: any) {
+        return { success: false, error: error.message };
       }
-
-      const newUser: User = {
-        id: crypto.randomUUID(),
-        name,
-        email,
-        createdAt: new Date().toISOString(),
-      };
-
-      // Store password hash (simple base64 for local demo)
-      const passwords = JSON.parse(localStorage.getItem("hc_passwords") || "{}");
-      passwords[newUser.id] = btoa(password);
-      localStorage.setItem("hc_passwords", JSON.stringify(passwords));
-
-      setUsers([...users, newUser]);
-      setAuth({ user: newUser, isAuthenticated: true });
-      return { success: true };
     },
     [users, setUsers, setAuth],
   );

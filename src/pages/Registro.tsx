@@ -5,36 +5,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
-import logo from "@/assets/horsecontrol_logo.png";
+import logo from "@/assets/horsecontrol_logo.svg";
 
 export default function Registro() {
   const navigate = useNavigate();
   const { register } = useAuth();
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [farmName, setFarmName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const formatPhone = (value: string) => {
-    const digits = value.replace(/\D/g, "").slice(0, 11);
-    if (digits.length <= 2) return digits;
-    if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!name.trim() || !phone.trim() || !email.trim() || !farmName.trim()) {
-      setError("Preencha todos os campos obrigatórios.");
-      return;
-    }
     if (password.length < 6) {
       setError("A senha deve ter pelo menos 6 caracteres.");
       return;
@@ -45,18 +32,16 @@ export default function Registro() {
     }
 
     setLoading(true);
-    try {
-      const result = await register(name, email, phone, password, farmName);
+    setTimeout(() => {
+      const result = register(name, email, password);
       if (result.success) {
+        alert("sucesso ao registrar user");
         navigate("/");
       } else {
         setError(result.error || "Erro ao criar conta.");
       }
-    } catch {
-      setError("Erro de conexão. Tente novamente.");
-    } finally {
       setLoading(false);
-    }
+    }, 500);
   };
 
   return (
@@ -69,27 +54,23 @@ export default function Registro() {
         </div>
         <div className="relative z-10 text-center px-12">
           <img src={logo} alt="Horse Control" className="h-20 mx-auto mb-8 brightness-0 invert" />
-          <h1 className="text-4xl font-bold text-primary-foreground mb-4">
-            Horse Control
-          </h1>
+          <h1 className="text-4xl font-bold text-primary-foreground mb-4">Horse Control</h1>
           <p className="text-primary-foreground/80 text-lg max-w-md">
-            Crie sua conta e comece a gerenciar seu haras com eficiência.
+            Crie sua conta e comece a gerenciar seus cavalos com eficiência.
           </p>
         </div>
       </div>
 
       {/* Right - Form */}
       <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-6">
+        <div className="w-full max-w-md space-y-8">
           <div className="lg:hidden flex justify-center mb-4">
             <img src={logo} alt="Horse Control" className="h-14" />
           </div>
 
           <div className="text-center">
             <h2 className="text-2xl font-bold text-foreground">Criar conta</h2>
-            <p className="text-muted-foreground mt-2">
-              Cadastre seu haras e comece a gerenciar
-            </p>
+            <p className="text-muted-foreground mt-2">Preencha os dados para começar</p>
           </div>
 
           {error && (
@@ -98,56 +79,26 @@ export default function Registro() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="name">Nome completo *</Label>
-              <Input
-                id="name"
-                placeholder="Seu nome"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="phone">Telefone *</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="(00) 00000-0000"
-                  value={phone}
-                  onChange={(e) => setPhone(formatPhone(e.target.value))}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">E-mail *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="seu@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
+              <Label htmlFor="name">Nome completo</Label>
+              <Input id="name" placeholder="Seu nome" value={name} onChange={(e) => setName(e.target.value)} required />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="farmName">Nome do Haras *</Label>
+              <Label htmlFor="email">E-mail</Label>
               <Input
-                id="farmName"
-                placeholder="Ex: Haras Bela Vista"
-                value={farmName}
-                onChange={(e) => setFarmName(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="seu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Senha *</Label>
+              <Label htmlFor="password">Senha</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -168,7 +119,7 @@ export default function Registro() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmar senha *</Label>
+              <Label htmlFor="confirmPassword">Confirmar senha</Label>
               <Input
                 id="confirmPassword"
                 type={showPassword ? "text" : "password"}
