@@ -37,7 +37,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { horses, activities, addHorse, toggleFavorite } = useHorses();
   const { events, addEvent, getUpcomingEvents } = useEvents();
-  const { getLowStockItems } = useStock();
+  const { stock, getLowStockItems } = useStock();
 
   const [isNewHorseOpen, setIsNewHorseOpen] = useState(false);
   const [isNewEventOpen, setIsNewEventOpen] = useState(false);

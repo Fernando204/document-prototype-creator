@@ -50,6 +50,7 @@ interface Colaborador {
 const Agenda = () => {
   const { events, addEvent, updateEvent, deleteEvent } = useEvents();
   const { horses } = useHorses();
+  const { stock } = useStock();
   const [colaboradores] = useLocalStorage<Colaborador[]>("horsecontrol-colaboradores", []);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [isNewEventOpen, setIsNewEventOpen] = useState(false);

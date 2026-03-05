@@ -64,6 +64,7 @@ const Colaboradores = () => {
   const [colaboradores, setColaboradores] = useLocalStorage<Colaborador[]>("horsecontrol-colaboradores", []);
   const { events, addEvent, updateEvent, deleteEvent } = useEvents();
   const { horses } = useHorses();
+  const { stock } = useStock();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
