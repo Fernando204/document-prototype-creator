@@ -1,6 +1,6 @@
 import { useLocalStorage } from "./useLocalStorage";
 import { useCallback } from "react";
-import { registerUser } from "@services/api";
+import { registerUser } from "@../services/api";
 
 export interface User {
   id: string;
