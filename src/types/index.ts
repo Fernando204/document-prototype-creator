@@ -47,6 +47,7 @@ export interface HealthEvent {
   veterinarian?: string;
   cost?: number;
   colaboradorIds?: string[];
+  stockItems?: EventStockItem[];
   createdAt: string;
 }
 
@@ -64,6 +65,7 @@ export interface StockItem {
   name: string;
   category: "medicamento" | "ração" | "suplemento" | "equipamento" | "higiene" | "outro";
   quantity: number;
+  reservedQuantity: number;
   unit: string;
   minQuantity: number;
   expirationDate?: string;
@@ -71,6 +73,11 @@ export interface StockItem {
   notes?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface EventStockItem {
+  stockItemId: string;
+  quantity: number;
 }
 
 export interface Competition {
