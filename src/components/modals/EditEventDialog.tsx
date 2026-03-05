@@ -5,11 +5,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { HealthEvent, Horse, EventStockItem, StockItem } from "@/types";
 import { toast } from "sonner";
@@ -55,8 +58,8 @@ export function EditEventDialog({
     status: event.status,
     veterinarian: event.veterinarian ?? "",
     cost: event.cost?.toString() ?? "",
-    colaboradorIds: event.colaboradorIds ?? [] as string[],
-    stockItems: event.stockItems ?? [] as EventStockItem[],
+    colaboradorIds: event.colaboradorIds ?? ([] as string[]),
+    stockItems: event.stockItems ?? ([] as EventStockItem[]),
   });
 
   useEffect(() => {
@@ -93,7 +96,9 @@ export function EditEventDialog({
   const toggleColaborador = (id: string) => {
     setForm((prev) => ({
       ...prev,
-      colaboradorIds: prev.colaboradorIds.includes(id) ? prev.colaboradorIds.filter((c) => c !== id) : [...prev.colaboradorIds, id],
+      colaboradorIds: prev.colaboradorIds.includes(id)
+        ? prev.colaboradorIds.filter((c) => c !== id)
+        : [...prev.colaboradorIds, id],
     }));
   };
 
@@ -163,7 +168,9 @@ export function EditEventDialog({
                   return (
                     <Badge key={hId} variant="secondary" className="gap-1">
                       {h?.name ?? "?"}
-                      <button type="button" onClick={() => toggleHorse(hId)}><X className="h-3 w-3" /></button>
+                      <button type="button" onClick={() => toggleHorse(hId)}>
+                        <X className="h-3 w-3" />
+                      </button>
                     </Badge>
                   );
                 })}
@@ -183,7 +190,9 @@ export function EditEventDialog({
           <div className="space-y-2">
             <Label>Tipo</Label>
             <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v as HealthEvent["type"] })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="vacinação">Vacinação</SelectItem>
                 <SelectItem value="vermifugação">Vermifugação</SelectItem>
@@ -218,7 +227,9 @@ export function EditEventDialog({
           <div className="space-y-2">
             <Label>Status</Label>
             <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as HealthEvent["status"] })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="agendado">Agendado</SelectItem>
                 <SelectItem value="concluído">Concluído</SelectItem>
@@ -227,20 +238,13 @@ export function EditEventDialog({
             </Select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Veterinário</Label>
-              <Input value={form.veterinarian} onChange={(e) => setForm({ ...form, veterinarian: e.target.value })} />
-            </div>
-            <div className="space-y-2">
-              <Label>Custo (R$)</Label>
-              <Input type="number" step="0.01" value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} />
-            </div>
-          </div>
-
           <div className="space-y-2">
             <Label>Descrição</Label>
-            <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} />
+            <Textarea
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              rows={2}
+            />
           </div>
 
           {/* Stock items */}
@@ -262,7 +266,9 @@ export function EditEventDialog({
                   return (
                     <Badge key={cId} variant="secondary" className="gap-1">
                       {c?.nome ?? "?"}
-                      <button onClick={() => toggleColaborador(cId)}><X className="h-3 w-3" /></button>
+                      <button onClick={() => toggleColaborador(cId)}>
+                        <X className="h-3 w-3" />
+                      </button>
                     </Badge>
                   );
                 })}
@@ -273,8 +279,14 @@ export function EditEventDialog({
                 <p className="text-xs text-muted-foreground">Nenhum colaborador ativo cadastrado.</p>
               ) : (
                 activeColabs.map((c) => (
-                  <label key={c.id} className="flex items-center gap-2 p-1 rounded hover:bg-muted cursor-pointer text-sm">
-                    <Checkbox checked={form.colaboradorIds.includes(c.id)} onCheckedChange={() => toggleColaborador(c.id)} />
+                  <label
+                    key={c.id}
+                    className="flex items-center gap-2 p-1 rounded hover:bg-muted cursor-pointer text-sm"
+                  >
+                    <Checkbox
+                      checked={form.colaboradorIds.includes(c.id)}
+                      onCheckedChange={() => toggleColaborador(c.id)}
+                    />
                     <span>{c.nome}</span>
                     <span className="text-xs text-muted-foreground">({c.funcao})</span>
                   </label>
@@ -285,8 +297,12 @@ export function EditEventDialog({
         </div>
 
         <DialogFooter className="flex-col sm:flex-row gap-2">
-          <Button variant="destructive" onClick={handleDelete} className="sm:mr-auto">Excluir</Button>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button variant="destructive" onClick={handleDelete} className="sm:mr-auto">
+            Excluir
+          </Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancelar
+          </Button>
           <Button onClick={handleSave}>Salvar Alterações</Button>
         </DialogFooter>
       </DialogContent>

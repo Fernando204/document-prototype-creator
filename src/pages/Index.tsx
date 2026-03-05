@@ -84,9 +84,7 @@ const Index = () => {
         {/* Welcome Header */}
         <div className="animate-fade-in">
           <h1 className="text-2xl font-bold text-foreground">Bom dia! 👋</h1>
-          <p className="text-muted-foreground mt-1">
-            Aqui está o resumo dos seus cavalos hoje.
-          </p>
+          <p className="text-muted-foreground mt-1">Aqui está o resumo dos seus cavalos hoje.</p>
         </div>
 
         {/* Stats Grid */}
@@ -123,13 +121,8 @@ const Index = () => {
           {/* Horses Section */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-foreground">
-                Cavalos Recentes
-              </h2>
-              <button
-                className="text-sm text-primary hover:underline font-medium"
-                onClick={() => navigate("/cavalos")}
-              >
+              <h2 className="text-lg font-semibold text-foreground">Cavalos Recentes</h2>
+              <button className="text-sm text-primary hover:underline font-medium" onClick={() => navigate("/cavalos")}>
                 Ver todos →
               </button>
             </div>
@@ -160,11 +153,7 @@ const Index = () => {
               onNewEvent={() => setIsNewEventOpen(true)}
               onReport={() => setIsReportOpen(true)}
             />
-            <UpcomingEvents
-              events={upcomingEvents}
-              horses={horses}
-              onViewAll={() => navigate("/saude")}
-            />
+            <UpcomingEvents events={upcomingEvents} horses={horses} onViewAll={() => navigate("/saude")} />
           </div>
         </div>
 
@@ -176,9 +165,7 @@ const Index = () => {
           <div className="bg-card rounded-xl shadow-soft p-5 animate-fade-in">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="h-5 w-5 text-horse-sage" />
-              <h2 className="text-lg font-semibold text-foreground">
-                Resumo Financeiro
-              </h2>
+              <h2 className="text-lg font-semibold text-foreground">Resumo Financeiro</h2>
               <button
                 className="ml-auto text-sm text-primary hover:underline font-medium"
                 onClick={() => navigate("/financeiro")}
@@ -190,9 +177,7 @@ const Index = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between p-3 bg-horse-sage-light rounded-lg">
                 <div>
-                  <p className="text-sm font-medium text-foreground">
-                    Receita do Mês
-                  </p>
+                  <p className="text-sm font-medium text-foreground">Receita do Mês</p>
                   <p className="text-xs text-muted-foreground">
                     {new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}
                   </p>
@@ -203,13 +188,9 @@ const Index = () => {
               <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                 <div>
                   <p className="text-sm font-medium text-foreground">Despesas</p>
-                  <p className="text-xs text-muted-foreground">
-                    Medicamentos, ração
-                  </p>
+                  <p className="text-xs text-muted-foreground">Medicamentos, ração</p>
                 </div>
-                <p className="text-xl font-bold text-muted-foreground">
-                  R$ 5.500
-                </p>
+                <p className="text-xl font-bold text-muted-foreground">R$ 5.500</p>
               </div>
 
               <div className="flex items-center justify-between p-3 bg-horse-gold-light rounded-lg">
@@ -225,11 +206,7 @@ const Index = () => {
       </div>
 
       {/* Modals */}
-      <HorseFormDialog
-        open={isNewHorseOpen}
-        onOpenChange={setIsNewHorseOpen}
-        onSave={addHorse}
-      />
+      <HorseFormDialog open={isNewHorseOpen} onOpenChange={setIsNewHorseOpen} onSave={addHorse} />
       <NewEventDialog
         open={isVaccineOpen}
         onOpenChange={setIsVaccineOpen}
@@ -245,12 +222,7 @@ const Index = () => {
         horses={horses}
         stock={stock}
       />
-      <ReportDialog
-        open={isReportOpen}
-        onOpenChange={setIsReportOpen}
-        horses={horses}
-        events={events}
-      />
+      <ReportDialog open={isReportOpen} onOpenChange={setIsReportOpen} horses={horses} events={events} />
       <HorseDetailDialog
         open={!!selectedHorse}
         onOpenChange={(open) => !open && setSelectedHorse(null)}
