@@ -32,15 +32,14 @@ export default function Registro() {
     }
 
     setLoading(true);
-    setTimeout(() => {
-      const result = register(name, email, password);
+    register(name, "", email, password, "").then((result) => {
       if (result.success) {
-        alert("sucesso ao registrar user");
+        navigate("/");
       } else {
         setError(result.error || "Erro ao criar conta.");
       }
       setLoading(false);
-    }, 500);
+    });
   };
 
   return (
