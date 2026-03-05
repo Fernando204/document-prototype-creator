@@ -5,25 +5,39 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
-import logo from "@/assets/horsecontrol_logo.svg";
+import logo from "@/assets/horsecontrol_logo.png";
+
+const formatPhone = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+};
 
 export default function Registro() {
   const navigate = useNavigate();
   const { register } = useAuth();
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [harasName, setHarasName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
+    if (!name.trim() || !phone.trim() || !email.trim() || !harasName.trim()) {
+      setError("Preencha todos os campos obrigatórios.");
+      return;
+    }
+
     if (password.length < 6) {
-      setError("A senha deve ter pelo menos 6 caracteresss.");
+      setError("A senha deve ter pelo menos 6 caracteres.");
       return;
     }
     if (password !== confirmPassword) {
@@ -32,14 +46,18 @@ export default function Registro() {
     }
 
     setLoading(true);
-    register(name, "", email, password, "").then((result) => {
+    try {
+      const result = await register(name, phone, email, password, harasName);
       if (result.success) {
         navigate("/");
       } else {
         setError(result.error || "Erro ao criar conta.");
       }
+    } catch {
+      setError("Erro de conexão. Tente novamente.");
+    } finally {
       setLoading(false);
-    });
+    }
   };
 
   return (
@@ -79,24 +97,28 @@ export default function Registro() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="name">Nome completo</Label>
-              <Input id="name" placeholder="Seu nome" value={name} onChange={(e) => setName(e.target.value)} required />
+              <Label htmlFor="name">Nome completo *</Label>
+              <Input id="name" placeholder="Seu nome completo" value={name} onChange={(e) => setName(e.target.value)} required />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="phone">Telefone *</Label>
+                <Input id="phone" placeholder="(00) 00000-0000" value={phone} onChange={(e) => setPhone(formatPhone(e.target.value))} required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">E-mail *</Label>
+                <Input id="email" type="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">E-mail</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <Label htmlFor="harasName">Nome do Haras *</Label>
+              <Input id="harasName" placeholder="Ex: Haras São Francisco" value={harasName} onChange={(e) => setHarasName(e.target.value)} required />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
+              <Label htmlFor="password">Senha *</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -117,7 +139,7 @@ export default function Registro() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmar senha</Label>
+              <Label htmlFor="confirmPassword">Confirmar senha *</Label>
               <Input
                 id="confirmPassword"
                 type={showPassword ? "text" : "password"}
