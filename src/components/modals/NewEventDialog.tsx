@@ -5,11 +5,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { HealthEvent, Horse, EventStockItem, StockItem } from "@/types";
 import { toast } from "sonner";
@@ -73,7 +76,9 @@ export function NewEventDialog({
   const toggleColaborador = (id: string) => {
     setFormData((prev) => ({
       ...prev,
-      colaboradorIds: prev.colaboradorIds.includes(id) ? prev.colaboradorIds.filter((c) => c !== id) : [...prev.colaboradorIds, id],
+      colaboradorIds: prev.colaboradorIds.includes(id)
+        ? prev.colaboradorIds.filter((c) => c !== id)
+        : [...prev.colaboradorIds, id],
     }));
   };
 
@@ -144,7 +149,9 @@ export function NewEventDialog({
                   return (
                     <Badge key={hId} variant="secondary" className="gap-1">
                       {h?.name ?? "?"}
-                      <button type="button" onClick={() => toggleHorse(hId)}><X className="h-3 w-3" /></button>
+                      <button type="button" onClick={() => toggleHorse(hId)}>
+                        <X className="h-3 w-3" />
+                      </button>
                     </Badge>
                   );
                 })}
@@ -163,8 +170,13 @@ export function NewEventDialog({
 
           <div className="space-y-2">
             <Label>Tipo</Label>
-            <Select value={formData.type} onValueChange={(v) => setFormData({ ...formData, type: v as HealthEvent["type"] })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={formData.type}
+              onValueChange={(v) => setFormData({ ...formData, type: v as HealthEvent["type"] })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="vacinação">Vacinação</SelectItem>
                 <SelectItem value="vermifugação">Vermifugação</SelectItem>
@@ -178,38 +190,48 @@ export function NewEventDialog({
 
           <div className="space-y-2">
             <Label>Título *</Label>
-            <Input value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="Ex: Vacina contra Raiva" />
+            <Input
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              placeholder="Ex: Vacina contra Raiva"
+            />
           </div>
 
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-2">
               <Label>Data *</Label>
-              <Input type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} />
+              <Input
+                type="date"
+                value={formData.date}
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              />
             </div>
             <div className="space-y-2">
               <Label>Início</Label>
-              <Input type="time" value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} />
+              <Input
+                type="time"
+                value={formData.time}
+                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+              />
             </div>
             <div className="space-y-2">
               <Label>Fim</Label>
-              <Input type="time" value={formData.endTime} onChange={(e) => setFormData({ ...formData, endTime: e.target.value })} />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Veterinário</Label>
-              <Input value={formData.veterinarian} onChange={(e) => setFormData({ ...formData, veterinarian: e.target.value })} placeholder="Nome do profissional" />
-            </div>
-            <div className="space-y-2">
-              <Label>Custo (R$)</Label>
-              <Input type="number" step="0.01" value={formData.cost} onChange={(e) => setFormData({ ...formData, cost: e.target.value })} placeholder="0,00" />
+              <Input
+                type="time"
+                value={formData.endTime}
+                onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+              />
             </div>
           </div>
 
           <div className="space-y-2">
             <Label>Descrição</Label>
-            <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Observações sobre o evento..." rows={2} />
+            <Textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Observações sobre o evento..."
+              rows={2}
+            />
           </div>
 
           {/* Stock items */}
@@ -232,7 +254,9 @@ export function NewEventDialog({
                     return (
                       <Badge key={cId} variant="secondary" className="gap-1">
                         {c?.nome ?? "?"}
-                        <button type="button" onClick={() => toggleColaborador(cId)}><X className="h-3 w-3" /></button>
+                        <button type="button" onClick={() => toggleColaborador(cId)}>
+                          <X className="h-3 w-3" />
+                        </button>
                       </Badge>
                     );
                   })}
@@ -240,8 +264,14 @@ export function NewEventDialog({
               )}
               <div className="max-h-32 overflow-y-auto space-y-1 rounded-md border border-border p-2">
                 {activeColabs.map((c) => (
-                  <label key={c.id} className="flex items-center gap-2 p-1 rounded hover:bg-muted cursor-pointer text-sm">
-                    <Checkbox checked={formData.colaboradorIds.includes(c.id)} onCheckedChange={() => toggleColaborador(c.id)} />
+                  <label
+                    key={c.id}
+                    className="flex items-center gap-2 p-1 rounded hover:bg-muted cursor-pointer text-sm"
+                  >
+                    <Checkbox
+                      checked={formData.colaboradorIds.includes(c.id)}
+                      onCheckedChange={() => toggleColaborador(c.id)}
+                    />
                     <span>{c.nome}</span>
                     <span className="text-xs text-muted-foreground">({c.funcao})</span>
                   </label>
@@ -251,7 +281,9 @@ export function NewEventDialog({
           )}
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancelar
+            </Button>
             <Button type="submit">Agendar</Button>
           </DialogFooter>
         </form>
