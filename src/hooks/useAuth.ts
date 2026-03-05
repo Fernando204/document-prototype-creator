@@ -1,6 +1,6 @@
 import { useLocalStorage } from "./useLocalStorage";
 import { useCallback } from "react";
-import {api} from "@services/api"
+import { registerUser, loginUser } from "@services/api";
 
 export interface User {
   id: string;
@@ -18,7 +18,6 @@ interface AuthState {
 }
 
 export function useAuth() {
-  const (registerUser) = api;
   const [users, setUsers] = useLocalStorage<User[]>("hc_users", []);
   const [auth, setAuth] = useLocalStorage<AuthState>("hc_auth", {
     user: null,
@@ -26,10 +25,8 @@ export function useAuth() {
   });
 
   const register = useCallback(
-    async (name: string,phone: string, email: string, password: string,harasName: string) => {
-      
+    async (name: string, phone: string, email: string, password: string, harasName: string) => {
       try {
-        
         const response = await registerUser({
           name,
           email,
