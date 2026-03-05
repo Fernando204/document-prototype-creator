@@ -49,7 +49,7 @@ export default function Registro() {
     try {
       const result = await register(name, phone, email, password, harasName);
       if (result.success) {
-        navigate("/");
+        alert("sucesso");
       } else {
         setError(result.error || "Erro ao criar conta.");
       }
@@ -98,23 +98,48 @@ export default function Registro() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="name">Nome completo *</Label>
-              <Input id="name" placeholder="Seu nome completo" value={name} onChange={(e) => setName(e.target.value)} required />
+              <Input
+                id="name"
+                placeholder="Seu nome completo"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="phone">Telefone *</Label>
-                <Input id="phone" placeholder="(00) 00000-0000" value={phone} onChange={(e) => setPhone(formatPhone(e.target.value))} required />
+                <Input
+                  id="phone"
+                  placeholder="(00) 00000-0000"
+                  value={phone}
+                  onChange={(e) => setPhone(formatPhone(e.target.value))}
+                  required
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">E-mail *</Label>
-                <Input id="email" type="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="harasName">Nome do Haras *</Label>
-              <Input id="harasName" placeholder="Ex: Haras São Francisco" value={harasName} onChange={(e) => setHarasName(e.target.value)} required />
+              <Input
+                id="harasName"
+                placeholder="Ex: Haras São Francisco"
+                value={harasName}
+                onChange={(e) => setHarasName(e.target.value)}
+                required
+              />
             </div>
 
             <div className="space-y-2">
