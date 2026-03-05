@@ -45,7 +45,13 @@ export function setStorageData<T>(key: string, data: T): void {
 
 const API_URL = "http://localhost:8080/auth/register";
 
-export async function registerUser(data: { name: string; email: string; password: string }) {
+export async function registerUser(data: {
+  name: string;
+  phone: string;
+  email: string;
+  password: string;
+  harasName: string;
+}) {
   const response = await fetch(`${API_URL}/auth/register`, {
     method: "POST",
     headers: {
