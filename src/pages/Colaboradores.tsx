@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Plus, Pencil, Trash2, Phone, Mail, Calendar, Clock } from "lucide-react";
+import { Users, Plus, Pencil, Trash2, Phone, Mail, Calendar, Clock, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useEvents } from "@/hooks/useEvents";
@@ -41,9 +41,10 @@ import type { HealthEvent } from "@/types";
 interface Colaborador {
   id: string;
   nome: string;
-  funcao: string;
   telefone: string;
   email: string;
+  cpf: string;
+  funcao: string;
   dataAdmissao: string;
   status: "ativo" | "inativo";
   observacoes: string;
@@ -56,8 +57,23 @@ const funcoes = [
 ];
 
 const emptyForm: Omit<Colaborador, "id"> = {
-  nome: "", funcao: "", telefone: "", email: "",
+  nome: "", telefone: "", email: "", cpf: "", funcao: "",
   dataAdmissao: "", status: "ativo", observacoes: "", horario: emptySchedule,
+};
+
+const formatCPF = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
+  if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+};
+
+const formatPhone = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 };
 
 const Colaboradores = () => {
@@ -78,7 +94,6 @@ const Colaboradores = () => {
 
   const selectedColab = colaboradores.find((c) => c.id === selectedColabId);
 
-  // Events for selected collaborator
   const colabEvents = selectedColabId
     ? events.filter((e) => e.colaboradorIds?.includes(selectedColabId))
     : [];
@@ -89,17 +104,38 @@ const Colaboradores = () => {
   const openEdit = (c: Colaborador) => {
     setEditingId(c.id);
     setForm({
-      nome: c.nome, funcao: c.funcao, telefone: c.telefone, email: c.email,
-      dataAdmissao: c.dataAdmissao, status: c.status, observacoes: c.observacoes,
-      horario: c.horario ?? emptySchedule,
+      nome: c.nome, telefone: c.telefone, email: c.email, cpf: c.cpf || "",
+      funcao: c.funcao, dataAdmissao: c.dataAdmissao, status: c.status,
+      observacoes: c.observacoes, horario: c.horario ?? emptySchedule,
     });
     setDialogOpen(true);
   };
 
   const handleSave = async () => {
-    if (!form.nome.trim() || !form.funcao) { toast.error("Nome e função são obrigatórios."); return; }
+    if (!form.nome.trim()) { toast.error("Nome é obrigatório."); return; }
+    if (!form.telefone.trim()) { toast.error("Telefone é obrigatório."); return; }
+    if (!form.email.trim()) { toast.error("E-mail é obrigatório."); return; }
+    if (!form.cpf.trim() || form.cpf.replace(/\D/g, "").length !== 11) {
+      toast.error("CPF inválido. Informe os 11 dígitos.");
+      return;
+    }
+
+    // Check email uniqueness
+    const emailDup = colaboradores.find(
+      (c) => c.email.toLowerCase() === form.email.toLowerCase() && c.id !== editingId
+    );
+    if (emailDup) { toast.error("Este e-mail já está cadastrado para outro colaborador."); return; }
+
+    // Check CPF uniqueness
+    const cpfClean = form.cpf.replace(/\D/g, "");
+    const cpfDup = colaboradores.find(
+      (c) => c.cpf.replace(/\D/g, "") === cpfClean && c.id !== editingId
+    );
+    if (cpfDup) { toast.error("Este CPF já está cadastrado para outro colaborador."); return; }
+
     setSaving(true);
     await new Promise((r) => setTimeout(r, 400));
+
     if (editingId) {
       setColaboradores((prev) => prev.map((c) => (c.id === editingId ? { ...c, ...form } : c)));
       toast.success("Colaborador atualizado!");
@@ -113,7 +149,6 @@ const Colaboradores = () => {
 
   const handleDelete = (id: string) => {
     setColaboradores((prev) => prev.filter((c) => c.id !== id));
-    // Remove collaborator from events
     events.forEach((e) => {
       if (e.colaboradorIds?.includes(id)) {
         updateEvent(e.id, { colaboradorIds: e.colaboradorIds.filter((cId) => cId !== id) });
@@ -151,7 +186,6 @@ const Colaboradores = () => {
             <TabsTrigger value="agenda"><Calendar className="h-4 w-4 mr-1" /> Agenda</TabsTrigger>
           </TabsList>
 
-          {/* ===== TAB LISTA ===== */}
           <TabsContent value="lista" className="space-y-4">
             <div className="flex items-center gap-3">
               <Label className="text-sm text-muted-foreground">Filtrar por função:</Label>
@@ -178,6 +212,7 @@ const Colaboradores = () => {
                       <TableHead>Nome</TableHead>
                       <TableHead>Função</TableHead>
                       <TableHead className="hidden md:table-cell">Contato</TableHead>
+                      <TableHead className="hidden lg:table-cell">CPF</TableHead>
                       <TableHead className="hidden lg:table-cell">Horário</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
@@ -190,12 +225,17 @@ const Colaboradores = () => {
                       return (
                         <TableRow key={c.id}>
                           <TableCell className="font-medium">{c.nome}</TableCell>
-                          <TableCell><Badge variant="secondary">{c.funcao}</Badge></TableCell>
+                          <TableCell>{c.funcao ? <Badge variant="secondary">{c.funcao}</Badge> : <span className="text-muted-foreground text-sm">—</span>}</TableCell>
                           <TableCell className="hidden md:table-cell">
                             <div className="flex flex-col gap-1 text-sm text-muted-foreground">
-                              {c.telefone && <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {c.telefone}</span>}
-                              {c.email && <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {c.email}</span>}
+                              <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {c.telefone}</span>
+                              <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {c.email}</span>
                             </div>
+                          </TableCell>
+                          <TableCell className="hidden lg:table-cell">
+                            <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                              <CreditCard className="h-3 w-3" /> {c.cpf || "—"}
+                            </span>
                           </TableCell>
                           <TableCell className="hidden lg:table-cell">
                             {workDays > 0 ? (
@@ -229,7 +269,6 @@ const Colaboradores = () => {
             )}
           </TabsContent>
 
-          {/* ===== TAB AGENDA ===== */}
           <TabsContent value="agenda" className="space-y-4">
             <div className="flex items-center gap-3">
               <Label className="text-sm text-muted-foreground">Colaborador:</Label>
@@ -238,7 +277,7 @@ const Colaboradores = () => {
                 <SelectContent>
                   <SelectItem value="none">Selecione...</SelectItem>
                   {colaboradores.filter((c) => c.status === "ativo").map((c) => (
-                    <SelectItem key={c.id} value={c.id}>{c.nome} — {c.funcao}</SelectItem>
+                    <SelectItem key={c.id} value={c.id}>{c.nome} — {c.funcao || "Sem cargo"}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -270,27 +309,31 @@ const Colaboradores = () => {
               <DialogTitle>{editingId ? "Editar Colaborador" : "Novo Colaborador"}</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-2">
+              <div className="space-y-2">
+                <Label>Nome completo *</Label>
+                <Input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Nome completo do colaborador" />
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Nome *</Label>
-                  <Input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Nome completo" />
+                  <Label>Telefone *</Label>
+                  <Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: formatPhone(e.target.value) })} placeholder="(00) 00000-0000" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Função *</Label>
-                  <Select value={form.funcao} onValueChange={(v) => setForm({ ...form, funcao: v })}>
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>{funcoes.map((f) => (<SelectItem key={f} value={f}>{f}</SelectItem>))}</SelectContent>
-                  </Select>
+                  <Label>E-mail *</Label>
+                  <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="email@exemplo.com" />
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Telefone</Label>
-                  <Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} placeholder="(00) 00000-0000" />
+                  <Label>CPF *</Label>
+                  <Input value={form.cpf} onChange={(e) => setForm({ ...form, cpf: formatCPF(e.target.value) })} placeholder="000.000.000-00" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="email@exemplo.com" />
+                  <Label>Cargo</Label>
+                  <Select value={form.funcao} onValueChange={(v) => setForm({ ...form, funcao: v })}>
+                    <SelectTrigger><SelectValue placeholder="Selecione (opcional)" /></SelectTrigger>
+                    <SelectContent>{funcoes.map((f) => (<SelectItem key={f} value={f}>{f}</SelectItem>))}</SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -323,7 +366,6 @@ const Colaboradores = () => {
           </DialogContent>
         </Dialog>
 
-        {/* New Event Dialog from colaborador agenda */}
         <NewEventDialog
           open={newEventOpen}
           onOpenChange={setNewEventOpen}

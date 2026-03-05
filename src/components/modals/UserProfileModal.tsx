@@ -18,17 +18,17 @@ export function UserProfileModal() {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user?.name || "");
   const [phone, setPhone] = useState(user?.phone || "");
-  const [farm, setFarm] = useState(user?.farm || "");
+  const [farm, setFarm] = useState(user?.farmName || "");
 
   const handleSave = () => {
-    updateProfile({ name, phone, farm });
+    updateProfile({ name, phone, farmName: farm });
     setIsEditing(false);
   };
 
   const handleCancel = () => {
     setName(user?.name || "");
     setPhone(user?.phone || "");
-    setFarm(user?.farm || "");
+    setFarm(user?.farmName || "");
     setIsEditing(false);
   };
 
@@ -124,9 +124,9 @@ export function UserProfileModal() {
                     📞 {user.phone}
                   </p>
                 )}
-                {user.farm && (
+                {user.farmName && (
                   <p className="px-3 py-1 text-xs text-muted-foreground">
-                    🏠 {user.farm}
+                    🏠 {user.farmName}
                   </p>
                 )}
               </div>

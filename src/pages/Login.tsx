@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { Eye, EyeOff, LogIn } from "lucide-react";
-import logo from "@/assets/horsecontrol_logo.svg";
+import logo from "@/assets/horsecontrol_logo.png";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -16,20 +16,28 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
-    setTimeout(() => {
-      const result = login(email, password);
+    if (!email.trim() || !password.trim()) {
+      setError("Preencha todos os campos.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await login(email, password);
       if (result.success) {
         navigate("/");
       } else {
         setError(result.error || "Erro ao fazer login.");
       }
+    } catch {
+      setError("Erro de conexão. Tente novamente.");
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   return (
