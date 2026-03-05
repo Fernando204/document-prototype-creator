@@ -29,9 +29,8 @@ const eventColors = {
 };
 
 export function UpcomingEvents({ events = [], horses = [], onViewAll }: UpcomingEventsProps) {
-  const getHorseName = (horseId: string) => {
-    return horses.find((h) => h.id === horseId)?.name || "Cavalo";
-  };
+  const getHorseNames = (horseIds: string[]) =>
+    horseIds.map((id) => horses.find((h) => h.id === id)?.name).filter(Boolean).join(", ") || "Cavalo";
 
   const formatEventDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -87,7 +86,7 @@ export function UpcomingEvents({ events = [], horses = [], onViewAll }: Upcoming
                     {event.title}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {getHorseName(event.horseId)}
+                    {getHorseNames(event.horseIds ?? [])}
                   </p>
                 </div>
 

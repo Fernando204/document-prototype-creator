@@ -123,9 +123,9 @@ export const ColaboradorAgenda = ({ schedule, events, onAddEvent, onEditEvent, o
                         <span className="text-[9px] text-muted-foreground">
                           {ev.time ?? ""}{ev.endTime ? `–${ev.endTime}` : ""}
                         </span>
-                        {getHorseName && (
+                        {getHorseName && ev.horseIds && (
                           <span className="text-[8px] text-muted-foreground block truncate">
-                            🐴 {getHorseName(ev.horseId)}
+                            🐴 {ev.horseIds.map((id) => getHorseName(id)).join(", ")}
                           </span>
                         )}
                       </div>
