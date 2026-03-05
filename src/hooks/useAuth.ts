@@ -1,78 +1,39 @@
 import { useLocalStorage } from "./useLocalStorage";
 import { useCallback } from "react";
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  farm?: string;
-  avatar?: string;
-  createdAt: string;
-}
+import { loginUser, registerUser, type AuthUser } from "@/services/authService";
 
 interface AuthState {
-  user: User | null;
+  user: AuthUser | null;
   isAuthenticated: boolean;
+  token?: string;
 }
 
 export function useAuth() {
-  const [users, setUsers] = useLocalStorage<User[]>("hc_users", []);
   const [auth, setAuth] = useLocalStorage<AuthState>("hc_auth", {
     user: null,
     isAuthenticated: false,
   });
 
   const register = useCallback(
-    (name: string, email: string, password: string) => {
-      const exists = users.find(
-        (u) => u.email.toLowerCase() === email.toLowerCase()
-      );
-      if (exists) {
-        return { success: false, error: "Este e-mail já está cadastrado." };
+    async (name: string, email: string, phone: string, password: string, farmName: string) => {
+      const result = await registerUser({ name, email, phone, password, farmName });
+      if (result.success && result.user) {
+        setAuth({ user: result.user, isAuthenticated: true, token: result.token });
       }
-
-      const newUser: User = {
-        id: crypto.randomUUID(),
-        name,
-        email,
-        createdAt: new Date().toISOString(),
-      };
-
-      // Store password hash (simple base64 for local demo)
-      const passwords = JSON.parse(
-        localStorage.getItem("hc_passwords") || "{}"
-      );
-      passwords[newUser.id] = btoa(password);
-      localStorage.setItem("hc_passwords", JSON.stringify(passwords));
-
-      setUsers([...users, newUser]);
-      setAuth({ user: newUser, isAuthenticated: true });
-      return { success: true };
+      return result;
     },
-    [users, setUsers, setAuth]
+    [setAuth]
   );
 
   const login = useCallback(
-    (email: string, password: string) => {
-      const user = users.find(
-        (u) => u.email.toLowerCase() === email.toLowerCase()
-      );
-      if (!user) {
-        return { success: false, error: "E-mail ou senha incorretos." };
+    async (email: string, password: string) => {
+      const result = await loginUser({ email, password });
+      if (result.success && result.user) {
+        setAuth({ user: result.user, isAuthenticated: true, token: result.token });
       }
-
-      const passwords = JSON.parse(
-        localStorage.getItem("hc_passwords") || "{}"
-      );
-      if (passwords[user.id] !== btoa(password)) {
-        return { success: false, error: "E-mail ou senha incorretos." };
-      }
-
-      setAuth({ user, isAuthenticated: true });
-      return { success: true };
+      return result;
     },
-    [users, setAuth]
+    [setAuth]
   );
 
   const logout = useCallback(() => {
@@ -80,21 +41,23 @@ export function useAuth() {
   }, [setAuth]);
 
   const updateProfile = useCallback(
-    (updates: Partial<User>) => {
+    (updates: Partial<AuthUser>) => {
       if (!auth.user) return;
       const updatedUser = { ...auth.user, ...updates };
       setAuth({ ...auth, user: updatedUser });
-      setUsers(users.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
     },
-    [auth, setAuth, users, setUsers]
+    [auth, setAuth]
   );
 
   return {
     user: auth.user,
     isAuthenticated: auth.isAuthenticated,
+    token: auth.token,
     register,
     login,
     logout,
     updateProfile,
   };
 }
+
+export type { AuthUser as User };
