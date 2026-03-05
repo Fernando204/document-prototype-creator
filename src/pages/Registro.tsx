@@ -23,7 +23,7 @@ export default function Registro() {
     setError("");
 
     if (password.length < 6) {
-      setError("A senha deve ter pelo menos 6 caracteres.");
+      setError("A senha deve ter pelo menos 6 caracteresss.");
       return;
     }
     if (password !== confirmPassword) {
@@ -36,7 +36,6 @@ export default function Registro() {
       const result = register(name, email, password);
       if (result.success) {
         alert("sucesso ao registrar user");
-        navigate("/");
       } else {
         setError(result.error || "Erro ao criar conta.");
       }
