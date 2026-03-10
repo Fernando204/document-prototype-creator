@@ -3,11 +3,9 @@ import { useHorses } from "@/hooks/useHorses";
 import { useEvents } from "@/hooks/useEvents";
 import { HorseCard } from "@/components/dashboard/HorseCard";
 import { HorseFormDialog } from "@/components/modals/HorseFormDialog";
-import { HorseDetailDialog } from "@/components/modals/HorseDetailDialog";
 import { useState } from "react";
 import { Plus, Search, Filter } from "lucide-react";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { Competition, Reproduction, Horse } from "@/types";
+import { Horse } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
