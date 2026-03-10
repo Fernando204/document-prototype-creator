@@ -1,5 +1,34 @@
 // Types for Horse Control
 
+export interface BiometricRecord {
+  id: string;
+  height?: number; // cm
+  weight?: number; // kg
+  bodyLength?: number; // cm
+  chestCircumference?: number; // cm
+  measuredAt: string;
+  measuredBy: string;
+}
+
+export interface HorseDescription {
+  temperament?: string;
+  behavior?: string;
+  physicalTraits?: string;
+  generalNotes?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+export interface HorseHistoryEntry {
+  id: string;
+  action: "criação" | "edição" | "biometria" | "resenha";
+  field?: string;
+  oldValue?: string;
+  newValue?: string;
+  user: string;
+  timestamp: string;
+}
+
 export interface Horse {
   id: string;
   name: string;
@@ -18,6 +47,9 @@ export interface Horse {
   notes?: string;
   isFavorite?: boolean;
   ownerIds?: string[];
+  biometrics?: BiometricRecord[];
+  description?: HorseDescription;
+  history?: HorseHistoryEntry[];
   createdAt: string;
   updatedAt: string;
 }
