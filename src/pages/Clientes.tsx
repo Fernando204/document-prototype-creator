@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Client, Horse } from "@/types";
@@ -41,8 +42,8 @@ const Clientes = () => {
   const [horses] = useLocalStorage<Horse[]>("horsecontrol-horses", []);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
-  const [detailClient, setDetailClient] = useState<Client | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -176,7 +177,7 @@ const Clientes = () => {
                     <div className="flex items-start justify-between">
                       <CardTitle className="text-base truncate">{client.name}</CardTitle>
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setDetailClient(client)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/clientes/${client.id}`)}>
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(client)}>
@@ -266,89 +267,6 @@ const Clientes = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Detail Dialog */}
-      <Dialog open={!!detailClient} onOpenChange={(open) => !open && setDetailClient(null)}>
-        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
-          {detailClient && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-primary" />
-                  {detailClient.name}
-                </DialogTitle>
-              </DialogHeader>
-
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                {detailClient.phone && (
-                  <div className="bg-muted/30 rounded-lg p-2.5">
-                    <p className="text-xs text-muted-foreground">Telefone</p>
-                    <p className="font-medium text-foreground">{detailClient.phone}</p>
-                  </div>
-                )}
-                {detailClient.email && (
-                  <div className="bg-muted/30 rounded-lg p-2.5">
-                    <p className="text-xs text-muted-foreground">Email</p>
-                    <p className="font-medium text-foreground truncate">{detailClient.email}</p>
-                  </div>
-                )}
-                {detailClient.document && (
-                  <div className="bg-muted/30 rounded-lg p-2.5">
-                    <p className="text-xs text-muted-foreground">CPF/CNPJ</p>
-                    <p className="font-medium text-foreground">{detailClient.document}</p>
-                  </div>
-                )}
-                {detailClient.address && (
-                  <div className="bg-muted/30 rounded-lg p-2.5">
-                    <p className="text-xs text-muted-foreground">Endereço</p>
-                    <p className="font-medium text-foreground">{detailClient.address}</p>
-                  </div>
-                )}
-              </div>
-
-              {detailClient.notes && (
-                <div className="bg-muted/50 rounded-lg p-3">
-                  <p className="text-xs font-medium text-muted-foreground mb-1">Observações</p>
-                  <p className="text-sm text-foreground">{detailClient.notes}</p>
-                </div>
-              )}
-
-              <Separator />
-
-              <div>
-                <h3 className="text-sm font-semibold text-foreground mb-3">
-                  Cavalos ({getClientHorses(detailClient.id).length})
-                </h3>
-                {getClientHorses(detailClient.id).length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    Nenhum cavalo vinculado a este cliente.
-                  </p>
-                ) : (
-                  <div className="space-y-2">
-                    {getClientHorses(detailClient.id).map((horse) => (
-                      <div key={horse.id} className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
-                        <div className="h-10 w-10 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-                          {horse.imageUrl ? (
-                            <img src={horse.imageUrl} alt={horse.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                              <User className="h-4 w-4" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{horse.name}</p>
-                          <p className="text-xs text-muted-foreground">{horse.breed} • {horse.age}</p>
-                        </div>
-                        <Badge variant="outline" className="text-xs capitalize">{horse.status}</Badge>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
     </MainLayout>
   );
 };

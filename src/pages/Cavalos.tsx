@@ -3,11 +3,9 @@ import { useHorses } from "@/hooks/useHorses";
 import { useEvents } from "@/hooks/useEvents";
 import { HorseCard } from "@/components/dashboard/HorseCard";
 import { HorseFormDialog } from "@/components/modals/HorseFormDialog";
-import { HorseDetailDialog } from "@/components/modals/HorseDetailDialog";
 import { useState } from "react";
 import { Plus, Search, Filter } from "lucide-react";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { Competition, Reproduction, Horse } from "@/types";
+import { Horse } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,11 +21,8 @@ const Cavalos = () => {
   const { events, getEventsByHorse } = useEvents();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingHorse, setEditingHorse] = useState<Horse | null>(null);
-  const [selectedHorse, setSelectedHorse] = useState<Horse | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [competitions] = useLocalStorage<Competition[]>("horsecontrol-competitions", []);
-  const [reproductions] = useLocalStorage<Reproduction[]>("horsecontrol-reproductions", []);
 
   const filteredHorses = horses.filter((horse) => {
     const matchesSearch = horse.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -141,7 +136,6 @@ const Cavalos = () => {
                 isFavorite={horse.isFavorite}
                 onToggleFavorite={() => toggleFavorite(horse.id)}
                 onDelete={() => deleteHorse(horse.id)}
-                onViewDetails={() => setSelectedHorse(horse)}
                 onEdit={() => handleEdit(horse)}
               />
             ))}
@@ -154,15 +148,6 @@ const Cavalos = () => {
         onOpenChange={setIsFormOpen}
         onSave={handleSave}
         horse={editingHorse}
-      />
-
-      <HorseDetailDialog
-        open={!!selectedHorse}
-        onOpenChange={(open) => !open && setSelectedHorse(null)}
-        horse={selectedHorse}
-        events={events}
-        competitions={competitions}
-        reproductions={reproductions}
       />
     </MainLayout>
   );

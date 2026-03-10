@@ -1,4 +1,5 @@
 import { Heart, Calendar, MoreVertical, Trash2, Edit2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -44,6 +45,11 @@ export function HorseCard({
   onViewDetails,
   onEdit,
 }: HorseCardProps) {
+  const navigate = useNavigate();
+  const handleViewDetails = () => {
+    if (id) navigate(`/cavalos/${id}`);
+    else onViewDetails?.();
+  };
   const config = statusConfig[status];
 
   return (
@@ -72,7 +78,7 @@ export function HorseCard({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onViewDetails}>Ver Detalhes</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleViewDetails}>Ver Detalhes</DropdownMenuItem>
             {onEdit && (
               <DropdownMenuItem onClick={onEdit}>
                 <Edit2 className="h-4 w-4 mr-2" />
@@ -104,7 +110,7 @@ export function HorseCard({
         )}
 
         <div className="flex gap-2 pt-2">
-          <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={onViewDetails}>
+          <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={handleViewDetails}>
             Ver Detalhes
           </Button>
           {onEdit && (
