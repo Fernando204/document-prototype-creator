@@ -78,7 +78,7 @@ export function HorseCard({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onViewDetails}>Ver Detalhes</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleViewDetails}>Ver Detalhes</DropdownMenuItem>
             {onEdit && (
               <DropdownMenuItem onClick={onEdit}>
                 <Edit2 className="h-4 w-4 mr-2" />
