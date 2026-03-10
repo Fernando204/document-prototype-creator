@@ -1,23 +1,28 @@
+import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useHorses } from "@/hooks/useHorses";
 import { useEvents } from "@/hooks/useEvents";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { Client, Competition, Reproduction } from "@/types";
+import { Client, Competition, Reproduction, BiometricRecord, HorseDescription, HorseHistoryEntry } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ArrowLeft, Heart, Calendar, Syringe, Trophy, Baby,
-  FileText, User, Edit2, MapPin, Clock,
+  FileText, User, Edit2, MapPin, FileDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { BiometricSection } from "@/components/cavalos/BiometricSection";
+import { DescriptionSection } from "@/components/cavalos/DescriptionSection";
+import { HorseHistorySection } from "@/components/cavalos/HorseHistorySection";
+import { HorseReport } from "@/components/cavalos/HorseReport";
 
-const statusConfig = {
-  saudável: { color: "bg-horse-sage-light text-horse-sage", dot: "bg-horse-sage" },
-  "em tratamento": { color: "bg-horse-gold-light text-horse-gold", dot: "bg-horse-gold" },
+const statusConfig: Record<string, { color: string; dot: string }> = {
+  saudável: { color: "bg-primary/10 text-primary", dot: "bg-primary" },
+  "em tratamento": { color: "bg-accent/10 text-accent", dot: "bg-accent" },
   observação: { color: "bg-destructive/10 text-destructive", dot: "bg-destructive" },
 };
 
@@ -34,8 +39,8 @@ const formatDateTime = (dateStr: string, time?: string) => {
 
 const eventStatusColor = (status: string) => {
   switch (status) {
-    case "concluído": return "text-horse-sage";
-    case "agendado": return "text-horse-gold";
+    case "concluído": return "text-primary";
+    case "agendado": return "text-accent";
     case "cancelado": return "text-destructive";
     default: return "text-muted-foreground";
   }
@@ -44,11 +49,14 @@ const eventStatusColor = (status: string) => {
 const CavaloDetalhes = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getHorseById, toggleFavorite } = useHorses();
+  const { getHorseById, toggleFavorite, updateHorse } = useHorses();
   const { events } = useEvents();
   const [clients] = useLocalStorage<Client[]>("horsecontrol-clients", []);
   const [competitions] = useLocalStorage<Competition[]>("horsecontrol-competitions", []);
   const [reproductions] = useLocalStorage<Reproduction[]>("horsecontrol-reproductions", []);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [showReport, setShowReport] = useState(false);
 
   const horse = id ? getHorseById(id) : undefined;
 
@@ -66,19 +74,68 @@ const CavaloDetalhes = () => {
     );
   }
 
-  const config = statusConfig[horse.status];
+  const config = statusConfig[horse.status] || statusConfig["saudável"];
   const owners = clients.filter((c) => (horse.ownerIds || []).includes(c.id));
   const horseEvents = events.filter((e) => e.horseIds?.includes(horse.id)).sort((a, b) => b.date.localeCompare(a.date));
   const horseCompetitions = competitions.filter((c) => c.horses.some((h) => h.horseId === horse.id)).sort((a, b) => b.date.localeCompare(a.date));
   const horseReproductions = reproductions.filter((r) => r.mareId === horse.id || r.stallionId === horse.id).sort((a, b) => b.date.localeCompare(a.date));
 
+  const addHistoryEntry = (entry: Omit<HorseHistoryEntry, "id" | "timestamp">) => {
+    const newEntry: HorseHistoryEntry = {
+      ...entry,
+      id: crypto.randomUUID(),
+      timestamp: new Date().toISOString(),
+    };
+    return newEntry;
+  };
+
+  const handleAddBiometric = (record: Omit<BiometricRecord, "id">) => {
+    const newRecord: BiometricRecord = { ...record, id: crypto.randomUUID() };
+    const history = [...(horse.history || []), addHistoryEntry({
+      action: "biometria",
+      field: "Medição biométrica",
+      newValue: [record.height && `${record.height}cm`, record.weight && `${record.weight}kg`].filter(Boolean).join(", "),
+      user: "Administrador",
+    })];
+    updateHorse(horse.id, {
+      biometrics: [...(horse.biometrics || []), newRecord],
+      history,
+    });
+    toast.success("Medição biométrica registrada!");
+  };
+
+  const handleSaveDescription = (description: HorseDescription) => {
+    const history = [...(horse.history || []), addHistoryEntry({
+      action: "resenha",
+      field: "Resenha do cavalo",
+      user: "Administrador",
+    })];
+    updateHorse(horse.id, { description, history });
+    toast.success("Resenha atualizada!");
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6 max-w-5xl">
-        {/* Back button */}
-        <Button variant="ghost" size="sm" onClick={() => navigate("/cavalos")} className="gap-2 text-muted-foreground">
-          <ArrowLeft className="h-4 w-4" /> Voltar para Cavalos
-        </Button>
+        {/* Top bar */}
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" size="sm" onClick={() => navigate("/cavalos")} className="gap-2 text-muted-foreground">
+            <ArrowLeft className="h-4 w-4" /> Voltar para Cavalos
+          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant={isEditing ? "default" : "outline"}
+              size="sm"
+              onClick={() => setIsEditing(!isEditing)}
+            >
+              <Edit2 className="h-3.5 w-3.5 mr-1" />
+              {isEditing ? "Finalizar Edição" : "Editar Informações"}
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setShowReport(true)}>
+              <FileDown className="h-3.5 w-3.5 mr-1" /> Gerar Relatório
+            </Button>
+          </div>
+        </div>
 
         {/* Hero Section */}
         <div className="flex flex-col md:flex-row gap-6">
@@ -86,8 +143,8 @@ const CavaloDetalhes = () => {
             {horse.imageUrl ? (
               <img src={horse.imageUrl} alt={horse.name} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-horse-cream to-muted">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-20 w-20 text-horse-brown-light/30">
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-secondary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-20 w-20 text-muted-foreground/30">
                   <path d="M22 10c0-1.5-1-3-2.5-3.5L17 6l-1-4-6 4-4 2c-1.5 1-2.5 2.5-2.5 4.5 0 1.5.5 3 1.5 4L6 18l1 3h2l1-3 2-1 3 1 1 3h2l1-3c1-1 1.5-2.5 1.5-4 0-1-.5-2-1.5-3l1.5-1Z" />
                   <circle cx="18" cy="8" r="1" />
                 </svg>
@@ -124,7 +181,7 @@ const CavaloDetalhes = () => {
           </div>
         </div>
 
-        {/* Proprietários */}
+        {/* Owners */}
         {owners.length > 0 && (
           <Card>
             <CardHeader className="pb-3">
@@ -148,7 +205,7 @@ const CavaloDetalhes = () => {
           </Card>
         )}
 
-        {/* Observações */}
+        {/* Notes */}
         {horse.notes && (
           <Card>
             <CardHeader className="pb-3">
@@ -161,6 +218,24 @@ const CavaloDetalhes = () => {
             </CardContent>
           </Card>
         )}
+
+        {/* Biometric Section */}
+        <BiometricSection
+          biometrics={horse.biometrics || []}
+          breed={horse.breed}
+          color={horse.color}
+          sex={horse.sex}
+          age={horse.age}
+          isEditing={isEditing}
+          onAddRecord={handleAddBiometric}
+        />
+
+        {/* Description / Resenha */}
+        <DescriptionSection
+          description={horse.description}
+          isEditing={isEditing}
+          onSave={handleSaveDescription}
+        />
 
         {/* History Tabs */}
         <Tabs defaultValue="saude" className="w-full">
@@ -267,7 +342,22 @@ const CavaloDetalhes = () => {
             )}
           </TabsContent>
         </Tabs>
+
+        {/* Change History */}
+        <HorseHistorySection history={horse.history || []} />
       </div>
+
+      {/* Report overlay */}
+      {showReport && (
+        <HorseReport
+          horse={horse}
+          events={horseEvents}
+          competitions={horseCompetitions}
+          reproductions={horseReproductions}
+          owners={owners}
+          onClose={() => setShowReport(false)}
+        />
+      )}
     </MainLayout>
   );
 };
