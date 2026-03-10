@@ -149,15 +149,6 @@ const Cavalos = () => {
         onSave={handleSave}
         horse={editingHorse}
       />
-
-      <HorseDetailDialog
-        open={!!selectedHorse}
-        onOpenChange={(open) => !open && setSelectedHorse(null)}
-        horse={selectedHorse}
-        events={events}
-        competitions={competitions}
-        reproductions={reproductions}
-      />
     </MainLayout>
   );
 };
