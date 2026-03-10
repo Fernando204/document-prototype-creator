@@ -1,6 +1,7 @@
 import { MainLayout } from "@/components/layout/MainLayout";
+import React, { useState } from "react";
 import { useStock } from "@/hooks/useStock";
-import { useState } from "react";
+import { useProducts } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,7 @@ const categoryColors: Record<string, string> = {
 
 const Estoque = () => {
   const { stock, addItem, updateItem, deleteItem, getLowStockItems } = useStock();
+  const { products } = useProducts();
   const [isNewItemOpen, setIsNewItemOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<StockItem | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,8 +48,7 @@ const Estoque = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: "",
-    category: "medicamento" as StockItem["category"],
+    productId: "",
     quantity: "",
     unit: "",
     minQuantity: "",
@@ -64,14 +65,19 @@ const Estoque = () => {
   });
 
   const resetForm = () => {
-    setFormData({ name: "", category: "medicamento", quantity: "", unit: "", minQuantity: "", expirationDate: "", location: "", notes: "" });
+    setFormData({ productId: "", quantity: "", unit: "", minQuantity: "", expirationDate: "", location: "", notes: "" });
     setEditingItem(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.quantity || !formData.unit.trim()) {
-      toast.error("Nome, quantidade e unidade são obrigatórios");
+    if (!formData.productId || !formData.quantity) {
+      toast.error("Produto e quantidade são obrigatórios");
+      return;
+    }
+    const selectedProd = products.find((p) => p.id === formData.productId);
+    if (!selectedProd) {
+      toast.error("Selecione um produto válido");
       return;
     }
 
@@ -79,30 +85,23 @@ const Estoque = () => {
     try {
       await new Promise((r) => setTimeout(r, 300));
 
+      const payload = {
+        name: selectedProd.name,
+        category: selectedProd.category || "outro",
+        quantity: parseInt(formData.quantity),
+        reservedQuantity: editingItem?.reservedQuantity || 0,
+        unit: selectedProd.unit || "",
+        minQuantity: parseInt(formData.minQuantity) || 0,
+        expirationDate: formData.expirationDate,
+        location: formData.location,
+        notes: formData.notes,
+      } as Omit<StockItem, "id" | "createdAt" | "updatedAt">;
+
       if (editingItem) {
-        updateItem(editingItem.id, {
-          name: formData.name,
-          category: formData.category,
-          quantity: parseInt(formData.quantity),
-          unit: formData.unit,
-          minQuantity: parseInt(formData.minQuantity) || 0,
-          expirationDate: formData.expirationDate,
-          location: formData.location,
-          notes: formData.notes,
-        });
+        updateItem(editingItem.id, payload);
         toast.success("Item atualizado!");
       } else {
-        addItem({
-          name: formData.name,
-          category: formData.category,
-          quantity: parseInt(formData.quantity),
-          reservedQuantity: 0,
-          unit: formData.unit,
-          minQuantity: parseInt(formData.minQuantity) || 0,
-          expirationDate: formData.expirationDate,
-          location: formData.location,
-          notes: formData.notes,
-        });
+        addItem(payload);
         toast.success("Item adicionado ao estoque!");
       }
 
@@ -117,11 +116,12 @@ const Estoque = () => {
 
   const openEdit = (item: StockItem) => {
     setEditingItem(item);
+    // try to locate the product by name
+    const prod = products.find((p) => p.name === item.name);
     setFormData({
-      name: item.name,
-      category: item.category,
+      productId: prod ? prod.id : "",
       quantity: item.quantity.toString(),
-      unit: item.unit,
+      unit: prod?.unit || item.unit,
       minQuantity: item.minQuantity.toString(),
       expirationDate: item.expirationDate || "",
       location: item.location || "",
@@ -129,6 +129,16 @@ const Estoque = () => {
     });
     setIsNewItemOpen(true);
   };
+
+  // when user picks a product we can auto-fill unit
+  React.useEffect(() => {
+    if (formData.productId) {
+      const prod = products.find((p) => p.id === formData.productId);
+      if (prod && prod.unit) {
+        setFormData((prev) => ({ ...prev, unit: prod.unit }));
+      }
+    }
+  }, [formData.productId, products]);
 
   return (
     <MainLayout>
@@ -139,7 +149,14 @@ const Estoque = () => {
             <h1 className="text-2xl font-bold text-foreground">Estoque</h1>
             <p className="text-muted-foreground">{stock.length} itens • {lowStockItems.length} com estoque baixo</p>
           </div>
-          <Button onClick={() => { resetForm(); setIsNewItemOpen(true); }}>
+          <Button disabled={products.length === 0} onClick={() => {
+              if (products.length === 0) {
+                toast.error("Cadastre ao menos um produto antes de adicionar ao estoque");
+                return;
+              }
+              resetForm();
+              setIsNewItemOpen(true);
+            }}>
             <Plus className="h-4 w-4 mr-2" />
             Adicionar Item
           </Button>
@@ -272,16 +289,12 @@ const Estoque = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2 col-span-2">
-                <Label htmlFor="name">Nome *</Label>
-                <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Nome do item" />
-              </div>
-              <div className="space-y-2">
-                <Label>Categoria</Label>
-                <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v as StockItem["category"] })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Label>Produto *</Label>
+                <Select value={formData.productId} onValueChange={(v) => setFormData({ ...formData, productId: v })} disabled={products.length === 0}>
+                  <SelectTrigger className="w-full"><SelectValue placeholder={products.length === 0 ? "Cadastre um produto primeiro" : "Selecione"} /></SelectTrigger>
                   <SelectContent>
-                    {Object.entries(categoryLabels).map(([key, label]) => (
-                      <SelectItem key={key} value={key}>{label}</SelectItem>
+                    {products.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

@@ -15,6 +15,10 @@ export type UpdateEventDTO = Partial<Omit<HealthEvent, "id" | "createdAt">>;
 export type CreateStockItemDTO = Omit<StockItem, "id" | "createdAt" | "updatedAt">;
 export type UpdateStockItemDTO = Partial<Omit<StockItem, "id" | "createdAt" | "updatedAt">>;
 
+// Product DTOs
+export type CreateProductDTO = Omit<Product, "id" | "createdAt" | "updatedAt">;
+export type UpdateProductDTO = Partial<Omit<Product, "id" | "createdAt" | "updatedAt">>;
+
 // Finance DTOs
 export interface Transaction {
   id: string;

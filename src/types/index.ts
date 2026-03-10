@@ -119,6 +119,18 @@ export interface StockItem {
   updatedAt: string;
 }
 
+// A basic product definition. Products are the master list used when adding items
+// to stock; stock entries must correspond to one of these products.
+export interface Product {
+  id: string;
+  name: string;
+  category?: "medicamento" | "ração" | "suplemento" | "equipamento" | "higiene" | "outro";
+  unit?: string;
+  price?: number; // unit price or cost for reference
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface EventStockItem {
   stockItemId: string;
   quantity: number;
