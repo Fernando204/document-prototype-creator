@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Heart, Calendar, Package, Trophy, Baby, Wallet,
@@ -7,6 +6,7 @@ import {
 } from "lucide-react";
 import logo from "@/assets/horsecontrol_logo.png";
 import { cn } from "@/lib/utils";
+import { useSidebarContext } from "@/contexts/SidebarContext";
 
 const HorseIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -51,7 +51,7 @@ const menuGroups = [
 ];
 
 export function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+  const { collapsed, toggle } = useSidebarContext();
   const location = useLocation();
 
   return (
@@ -115,7 +115,7 @@ export function Sidebar() {
           {!collapsed && <span>Configurações</span>}
         </Link>
         <button
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={toggle}
           className={cn(
             "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
             collapsed && "justify-center px-2"

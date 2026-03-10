@@ -110,7 +110,7 @@ export function HorseCard({
         )}
 
         <div className="flex gap-2 pt-2">
-          <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={handleViewDetails}>
+          <Button variant="outline" size="sm" className="flex-1 text-xs h-8" onClick={handleViewDetails}>
             Ver Detalhes
           </Button>
           {onEdit && (

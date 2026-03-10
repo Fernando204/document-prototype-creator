@@ -94,7 +94,7 @@ const CavaloDetalhes = () => {
     const history = [...(horse.history || []), addHistoryEntry({
       action: "biometria",
       field: "Medição biométrica",
-      newValue: [record.height && `${record.height}cm`, record.weight && `${record.weight}kg`].filter(Boolean).join(", "),
+      newValue: [record.withersHeight && `A:${record.withersHeight}cm`, record.weight && `${record.weight}kg`].filter(Boolean).join(", "),
       user: "Administrador",
     })];
     updateHorse(horse.id, {

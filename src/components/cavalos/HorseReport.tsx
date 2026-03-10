@@ -105,12 +105,16 @@ export function HorseReport({ horse, events, competitions, reproductions, owners
           {latest && (
             <div>
               <h2 className="text-sm font-semibold text-foreground mb-2">Dados Biométricos</h2>
-              <div className="grid grid-cols-4 gap-2 text-sm">
+                <div className="grid grid-cols-4 gap-2 text-sm">
                 {[
-                  { l: "Altura", v: latest.height ? `${latest.height} cm` : "—" },
+                  { l: "Altura Cernelha", v: latest.withersHeight ? `${latest.withersHeight} cm` : "—" },
                   { l: "Peso", v: latest.weight ? `${latest.weight} kg` : "—" },
-                  { l: "Comprimento", v: latest.bodyLength ? `${latest.bodyLength} cm` : "—" },
-                  { l: "Circ. Torácica", v: latest.chestCircumference ? `${latest.chestCircumference} cm` : "—" },
+                  { l: "Comp. Corpo", v: latest.bodyLength ? `${latest.bodyLength} cm` : "—" },
+                  { l: "Perím. Torácico", v: latest.chestCircumference ? `${latest.chestCircumference} cm` : "—" },
+                  { l: "Altura Garupa", v: latest.crumpHeight ? `${latest.crumpHeight} cm` : "—" },
+                  { l: "Comp. Pescoço", v: latest.neckLength ? `${latest.neckLength} cm` : "—" },
+                  { l: "Largura Ancas", v: latest.hipWidth ? `${latest.hipWidth} cm` : "—" },
+                  { l: "Perím. Canela", v: latest.cannonPerimeter ? `${latest.cannonPerimeter} cm` : "—" },
                 ].map((i) => (
                   <div key={i.l} className="bg-muted/20 rounded p-2">
                     <p className="text-xs text-muted-foreground">{i.l}</p>
