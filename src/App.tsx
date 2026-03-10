@@ -34,36 +34,38 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/registro" element={<Registro />} />
-          <Route path="/" element={<Index />} />
-          <Route path="/cavalos" element={<Cavalos />} />
-          <Route path="/cavalos/:id" element={<CavaloDetalhes />} />
-          <Route path="/saude" element={<Saude />} />
-          <Route path="/estoque" element={<Estoque />} />
-          <Route path="/competicao" element={<Competicao />} />
-          <Route path="/reproducao" element={<Reproducao />} />
-          <Route path="/financeiro" element={<Financeiro />} />
-          <Route path="/agenda" element={<Agenda />} />
-          <Route path="/configuracoes" element={<Configuracoes />} />
-          <Route path="/colaboradores" element={<Colaboradores />} />
-          <Route path="/clientes" element={<Clientes />} />
-          <Route path="/clientes/:id" element={<ClienteDetalhes />} />
-          <Route path="/fornecedores" element={<Fornecedores />} />
-          <Route path="/fornecedores/:id" element={<FornecedorDetalhes />} />
-          <Route path="/equipes" element={<Equipes />} />
-          <Route path="/estabulos" element={<Estabulos />} />
-          <Route path="/arquivos" element={<Arquivos />} />
-          <Route path="/historico" element={<Historico />} />
-          <Route path="/contas" element={<Contas />} />
-          <Route path="/produtos" element={<Produtos />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <SidebarProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/registro" element={<Registro />} />
+            <Route path="/" element={<Index />} />
+            <Route path="/cavalos" element={<Cavalos />} />
+            <Route path="/cavalos/:id" element={<CavaloDetalhes />} />
+            <Route path="/saude" element={<Saude />} />
+            <Route path="/estoque" element={<Estoque />} />
+            <Route path="/competicao" element={<Competicao />} />
+            <Route path="/reproducao" element={<Reproducao />} />
+            <Route path="/financeiro" element={<Financeiro />} />
+            <Route path="/agenda" element={<Agenda />} />
+            <Route path="/configuracoes" element={<Configuracoes />} />
+            <Route path="/colaboradores" element={<Colaboradores />} />
+            <Route path="/clientes" element={<Clientes />} />
+            <Route path="/clientes/:id" element={<ClienteDetalhes />} />
+            <Route path="/fornecedores" element={<Fornecedores />} />
+            <Route path="/fornecedores/:id" element={<FornecedorDetalhes />} />
+            <Route path="/equipes" element={<Equipes />} />
+            <Route path="/estabulos" element={<Estabulos />} />
+            <Route path="/arquivos" element={<Arquivos />} />
+            <Route path="/historico" element={<Historico />} />
+            <Route path="/contas" element={<Contas />} />
+            <Route path="/produtos" element={<Produtos />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </SidebarProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
