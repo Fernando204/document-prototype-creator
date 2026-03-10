@@ -45,6 +45,11 @@ export function HorseCard({
   onViewDetails,
   onEdit,
 }: HorseCardProps) {
+  const navigate = useNavigate();
+  const handleViewDetails = () => {
+    if (id) navigate(`/cavalos/${id}`);
+    else onViewDetails?.();
+  };
   const config = statusConfig[status];
 
   return (
