@@ -42,8 +42,8 @@ const Clientes = () => {
   const [horses] = useLocalStorage<Horse[]>("horsecontrol-horses", []);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
-  const [detailClient, setDetailClient] = useState<Client | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
