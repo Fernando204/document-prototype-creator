@@ -51,7 +51,7 @@ const menuGroups = [
 ];
 
 export function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+  const { collapsed, toggle } = useSidebarContext();
   const location = useLocation();
 
   return (
