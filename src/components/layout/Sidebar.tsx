@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import logo from "@/assets/horsecontrol_logo.png";
 import { cn } from "@/lib/utils";
+import { useSidebarContext } from "@/contexts/SidebarContext";
 
 const HorseIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
