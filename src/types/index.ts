@@ -2,10 +2,22 @@
 
 export interface BiometricRecord {
   id: string;
-  height?: number; // cm
-  weight?: number; // kg
-  bodyLength?: number; // cm
-  chestCircumference?: number; // cm
+  withersHeight?: number;       // A - Altura na Cernelha (cm)
+  crumpHeight?: number;         // B - Altura na Garupa (cm)
+  elbowGroundDist?: number;     // C - Distância Codilho-Solo (cm)
+  chestCircumference?: number;  // D - Perímetro Torácico (cm)
+  headLength?: number;          // E - Comprimento da Cabeça (cm)
+  neckLength?: number;          // F - Comprimento do Pescoço (cm)
+  shoulderLength?: number;      // G - Comprimento da Espádua (cm)
+  backLoinLength?: number;      // H - Comprimento Dorso-Lombo (cm)
+  crumpLength?: number;         // I - Comprimento da Garupa (cm)
+  bodyLength?: number;          // J - Comprimento do Corpo (cm)
+  forearmPerimeter?: number;    // K - Perímetro Antebraço (cm)
+  kneePerimeter?: number;       // L - Perímetro Joelho (cm)
+  cannonPerimeter?: number;     // M - Perímetro Canela (cm)
+  headWidth?: number;           // N - Largura da Cabeça (cm)
+  hipWidth?: number;            // O - Largura das Ancas (cm)
+  weight?: number;              // Peso (kg)
   measuredAt: string;
   measuredBy: string;
 }

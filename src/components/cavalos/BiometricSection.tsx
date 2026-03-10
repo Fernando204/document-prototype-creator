@@ -30,31 +30,50 @@ const formatTime = (d: string) => {
   } catch { return ""; }
 };
 
+const biometricFields = [
+  { key: "withersHeight", label: "A - Altura na Cernelha", unit: "cm" },
+  { key: "crumpHeight", label: "B - Altura na Garupa", unit: "cm" },
+  { key: "elbowGroundDist", label: "C - Dist. Codilho-Solo", unit: "cm" },
+  { key: "chestCircumference", label: "D - Perímetro Torácico", unit: "cm" },
+  { key: "headLength", label: "E - Comp. Cabeça", unit: "cm" },
+  { key: "neckLength", label: "F - Comp. Pescoço", unit: "cm" },
+  { key: "shoulderLength", label: "G - Comp. Espádua", unit: "cm" },
+  { key: "backLoinLength", label: "H - Comp. Dorso-Lombo", unit: "cm" },
+  { key: "crumpLength", label: "I - Comp. Garupa", unit: "cm" },
+  { key: "bodyLength", label: "J - Comp. do Corpo", unit: "cm" },
+  { key: "forearmPerimeter", label: "K - Perím. Antebraço", unit: "cm" },
+  { key: "kneePerimeter", label: "L - Perím. Joelho", unit: "cm" },
+  { key: "cannonPerimeter", label: "M - Perím. Canela", unit: "cm" },
+  { key: "headWidth", label: "N - Largura da Cabeça", unit: "cm" },
+  { key: "hipWidth", label: "O - Largura das Ancas", unit: "cm" },
+  { key: "weight", label: "Peso", unit: "kg" },
+] as const;
+
+type FieldKey = typeof biometricFields[number]["key"];
+
+const emptyForm: Record<FieldKey, string> = Object.fromEntries(
+  biometricFields.map((f) => [f.key, ""])
+) as Record<FieldKey, string>;
+
 export function BiometricSection({ biometrics, breed, color, sex, age, isEditing, onAddRecord }: BiometricSectionProps) {
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ height: "", weight: "", bodyLength: "", chestCircumference: "" });
+  const [form, setForm] = useState<Record<FieldKey, string>>({ ...emptyForm });
 
   const latest = biometrics.length > 0 ? biometrics[biometrics.length - 1] : null;
 
   const handleSave = () => {
-    onAddRecord({
-      height: form.height ? Number(form.height) : undefined,
-      weight: form.weight ? Number(form.weight) : undefined,
-      bodyLength: form.bodyLength ? Number(form.bodyLength) : undefined,
-      chestCircumference: form.chestCircumference ? Number(form.chestCircumference) : undefined,
+    const record: Omit<BiometricRecord, "id"> = {
       measuredAt: new Date().toISOString(),
       measuredBy: "Administrador",
+    };
+    biometricFields.forEach((f) => {
+      const val = form[f.key];
+      if (val) (record as any)[f.key] = Number(val);
     });
-    setForm({ height: "", weight: "", bodyLength: "", chestCircumference: "" });
+    onAddRecord(record);
+    setForm({ ...emptyForm });
     setShowForm(false);
   };
-
-  const metrics = [
-    { label: "Altura", value: latest?.height, unit: "cm", icon: Ruler },
-    { label: "Peso", value: latest?.weight, unit: "kg", icon: Weight },
-    { label: "Comprimento", value: latest?.bodyLength, unit: "cm", icon: Ruler },
-    { label: "Circ. Torácica", value: latest?.chestCircumference, unit: "cm", icon: Ruler },
-  ];
 
   const infoItems = [
     { label: "Pelagem", value: color },
@@ -85,22 +104,24 @@ export function BiometricSection({ biometrics, breed, color, sex, age, isEditing
             <img
               src={horseBiometricsImg}
               alt="Pontos de medição biométrica do cavalo"
-              className="max-h-56 w-auto object-contain"
+              className="max-h-72 w-auto object-contain"
             />
           </div>
 
           <div className="lg:w-1/2 space-y-4">
-            {/* Metrics grid */}
-            <div className="grid grid-cols-2 gap-3">
-              {metrics.map((m) => (
-                <div key={m.label} className="bg-muted/30 rounded-lg p-3 text-center">
-                  <m.icon className="h-4 w-4 mx-auto text-primary mb-1" />
-                  <p className="text-xs text-muted-foreground">{m.label}</p>
-                  <p className="text-lg font-semibold text-foreground">
-                    {m.value != null ? `${m.value} ${m.unit}` : "—"}
-                  </p>
-                </div>
-              ))}
+            {/* Metrics grid - all 15 + weight */}
+            <div className="grid grid-cols-2 gap-2">
+              {biometricFields.map((m) => {
+                const val = latest ? (latest as any)[m.key] : undefined;
+                return (
+                  <div key={m.key} className="bg-muted/30 rounded-lg p-2.5 text-center">
+                    <p className="text-[10px] text-muted-foreground leading-tight">{m.label}</p>
+                    <p className="text-sm font-semibold text-foreground">
+                      {val != null ? `${val} ${m.unit}` : "—"}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Info items */}
@@ -120,22 +141,17 @@ export function BiometricSection({ biometrics, breed, color, sex, age, isEditing
           <div className="border rounded-lg p-4 space-y-4 bg-muted/10">
             <p className="text-sm font-semibold text-foreground">Nova Medição</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="space-y-1">
-                <Label className="text-xs">Altura (cm)</Label>
-                <Input type="number" value={form.height} onChange={(e) => setForm({ ...form, height: e.target.value })} placeholder="0" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Peso (kg)</Label>
-                <Input type="number" value={form.weight} onChange={(e) => setForm({ ...form, weight: e.target.value })} placeholder="0" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Comprimento (cm)</Label>
-                <Input type="number" value={form.bodyLength} onChange={(e) => setForm({ ...form, bodyLength: e.target.value })} placeholder="0" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Circ. Torácica (cm)</Label>
-                <Input type="number" value={form.chestCircumference} onChange={(e) => setForm({ ...form, chestCircumference: e.target.value })} placeholder="0" />
-              </div>
+              {biometricFields.map((f) => (
+                <div key={f.key} className="space-y-1">
+                  <Label className="text-[10px] leading-tight">{f.label} ({f.unit})</Label>
+                  <Input
+                    type="number"
+                    value={form[f.key]}
+                    onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+                    placeholder="0"
+                  />
+                </div>
+              ))}
             </div>
             <div className="flex gap-2 justify-end">
               <Button variant="ghost" size="sm" onClick={() => setShowForm(false)}>
@@ -156,11 +172,11 @@ export function BiometricSection({ biometrics, breed, color, sex, age, isEditing
               {[...biometrics].reverse().slice(1).map((rec) => (
                 <div key={rec.id} className="flex items-center justify-between text-xs bg-muted/20 rounded-md px-3 py-2">
                   <span className="text-muted-foreground">{formatDate(rec.measuredAt)} {formatTime(rec.measuredAt)}</span>
-                  <div className="flex gap-3 text-foreground">
-                    {rec.height && <span>{rec.height}cm</span>}
+                  <div className="flex gap-2 text-foreground flex-wrap">
+                    {rec.withersHeight && <span>A:{rec.withersHeight}cm</span>}
+                    {rec.chestCircumference && <span>D:{rec.chestCircumference}cm</span>}
+                    {rec.bodyLength && <span>J:{rec.bodyLength}cm</span>}
                     {rec.weight && <span>{rec.weight}kg</span>}
-                    {rec.bodyLength && <span>C:{rec.bodyLength}cm</span>}
-                    {rec.chestCircumference && <span>T:{rec.chestCircumference}cm</span>}
                   </div>
                   <Badge variant="outline" className="text-[10px]">{rec.measuredBy}</Badge>
                 </div>
