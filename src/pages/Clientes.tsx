@@ -177,7 +177,7 @@ const Clientes = () => {
                     <div className="flex items-start justify-between">
                       <CardTitle className="text-base truncate">{client.name}</CardTitle>
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setDetailClient(client)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/clientes/${client.id}`)}>
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(client)}>
