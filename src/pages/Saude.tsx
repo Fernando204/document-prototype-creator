@@ -47,6 +47,7 @@ const Saude = () => {
   const { events, addEvent, completeEvent, deleteEvent } = useEvents();
   const { horses } = useHorses();
   const { stock } = useStock();
+  const { categories: eventCategories, labelsMap: eventLabelsMap } = useCategories("event");
   const [colaboradores] = useLocalStorage<Colaborador[]>("horsecontrol-colaboradores", []);
   const [isNewEventOpen, setIsNewEventOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
