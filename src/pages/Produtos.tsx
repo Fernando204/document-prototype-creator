@@ -23,7 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CategorySelect } from "@/components/CategorySelect";
 import { useCategories } from "@/hooks/useCategories";
 import { Plus, Edit2, Trash2, Loader2 } from "lucide-react";
-import { useProducts } from "@/hooks/useProducts";
+import { toast } from "sonner";
 import { useStock } from "@/hooks/useStock";
 import { Product } from "@/types";
 
