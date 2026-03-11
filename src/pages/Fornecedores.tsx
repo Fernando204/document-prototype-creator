@@ -30,15 +30,8 @@ export interface Supplier {
   updatedAt: string;
 }
 
-const typeLabels: Record<Supplier["type"], string> = {
-  ração: "Ração",
-  medicamento: "Medicamento",
-  equipamento: "Equipamento",
-  veterinário: "Veterinário",
-  ferreiro: "Ferreiro",
-  transporte: "Transporte",
-  outro: "Outro",
-};
+const Fornecedores = () => {
+  const { labelsMap: typeLabelsMap } = useCategories("supplier");
 
 const Fornecedores = () => {
   const [suppliers, setSuppliers] = useLocalStorage<Supplier[]>("horsecontrol-suppliers", []);
