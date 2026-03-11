@@ -115,7 +115,7 @@ const Fornecedores = () => {
                 <CardContent className="space-y-2 text-sm text-muted-foreground">
                   {supplier.phone && <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5" /><span>{supplier.phone}</span></div>}
                   {supplier.email && <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5" /><span className="truncate">{supplier.email}</span></div>}
-                  <Badge variant="secondary" className="text-xs">{typeLabels[supplier.type]}</Badge>
+                  <Badge variant="secondary" className="text-xs">{typeLabelsMap[supplier.type] || supplier.type}</Badge>
                 </CardContent>
               </Card>
             ))}
