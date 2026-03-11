@@ -19,23 +19,10 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { StockItem } from "@/types";
 
-const categoryLabels: Record<string, string> = {
-  medicamento: "Medicamento",
-  ração: "Ração",
-  suplemento: "Suplemento",
-  equipamento: "Equipamento",
-  higiene: "Higiene",
-  outro: "Outro",
-};
-
-const categoryColors: Record<string, string> = {
-  medicamento: "bg-destructive/10 text-destructive",
-  ração: "bg-accent/50 text-accent-foreground",
-  suplemento: "bg-primary/10 text-primary",
-  equipamento: "bg-secondary text-secondary-foreground",
-  higiene: "bg-muted text-muted-foreground",
-  outro: "bg-muted text-muted-foreground",
-};
+const Estoque = () => {
+  const { stock, addItem, updateItem, deleteItem, getLowStockItems } = useStock();
+  const { products } = useProducts();
+  const { labelsMap } = useCategories("product");
 
 const Estoque = () => {
   const { stock, addItem, updateItem, deleteItem, getLowStockItems } = useStock();
