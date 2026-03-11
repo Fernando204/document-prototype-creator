@@ -273,14 +273,17 @@ const Estoque = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2 col-span-2">
                 <Label>Produto *</Label>
-                <Select value={formData.productId} onValueChange={(v) => setFormData({ ...formData, productId: v })} disabled={products.length === 0}>
-                  <SelectTrigger className="w-full"><SelectValue placeholder={products.length === 0 ? "Cadastre um produto primeiro" : "Selecione"} /></SelectTrigger>
-                  <SelectContent>
-                    {products.map((p) => (
-                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <select
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  value={formData.productId}
+                  onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
+                  disabled={products.length === 0}
+                >
+                  <option value="">{products.length === 0 ? "Cadastre um produto primeiro" : "Selecione"}</option>
+                  {products.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="unit">Unidade *</Label>
