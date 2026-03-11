@@ -146,14 +146,12 @@ const Fornecedores = () => {
             </div>
             <div className="space-y-2">
               <Label>Tipo de Serviço/Produto</Label>
-              <Select value={formData.type} onValueChange={(v) => setFormData({ ...formData, type: v as Supplier["type"] })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {Object.entries(typeLabels).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>{label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <CategorySelect
+                group="supplier"
+                value={formData.type}
+                onValueChange={(v) => setFormData({ ...formData, type: v as Supplier["type"] })}
+                placeholder="Selecione"
+              />
             </div>
             <div className="space-y-2">
               <Label>Observações</Label>
