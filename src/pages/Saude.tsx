@@ -100,13 +100,10 @@ const Saude = () => {
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Tipo" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos Tipos</SelectItem>
-              <SelectItem value="vacinação">Vacinação</SelectItem>
-              <SelectItem value="vermifugação">Vermifugação</SelectItem>
-              <SelectItem value="ferrageamento">Ferrageamento</SelectItem>
-              <SelectItem value="veterinário">Veterinário</SelectItem>
-              <SelectItem value="medicamento">Medicamento</SelectItem>
-              <SelectItem value="outro">Outro</SelectItem>
+              <SelectItem value="all">Todas Categorias</SelectItem>
+              {eventCategories.map((cat) => (
+                <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
