@@ -28,6 +28,7 @@ import { NewCategoryDialog } from "@/components/modals/NewCategoryDialog";
 const groupLabels: Record<string, string> = {
   product: "Produtos/Estoque",
   supplier: "Fornecedores",
+  event: "Eventos",
 };
 
 export function CategoryManager() {
