@@ -169,19 +169,13 @@ const Produtos = () => {
               </div>
               <div className="space-y-2">
                 <Label>Categoria</Label>
-                <Select
+                <CategorySelect
+                  group="product"
                   value={formData.category}
                   onValueChange={(val) => setFormData({ ...formData, category: val as Product["category"] })}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="(nenhuma)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(categoryLabels).map(([key, label]) => (
-                      <SelectItem key={key} value={key}>{label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  placeholder="(nenhuma)"
+                  className="w-full"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="unit">Unidade</Label>
