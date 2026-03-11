@@ -12,12 +12,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { HealthEvent, Horse, EventStockItem, StockItem } from "@/types";
 import { toast } from "sonner";
 import { Users, X, CheckSquare } from "lucide-react";
 import { EventStockSelector } from "./EventStockSelector";
+import { CategorySelect } from "@/components/CategorySelect";
 
 interface Colaborador {
   id: string;
