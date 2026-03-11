@@ -20,7 +20,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Edit2, Trash2, Loader2 } from "lucide-react";
+import { CategorySelect } from "@/components/CategorySelect";
+import { useCategories } from "@/hooks/useCategories";
 import { toast } from "sonner";
 import { useProducts } from "@/hooks/useProducts";
 import { useStock } from "@/hooks/useStock";
