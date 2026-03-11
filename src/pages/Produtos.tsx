@@ -129,7 +129,7 @@ const Produtos = () => {
                   return (
                     <TableRow key={p.id}>
                       <TableCell className="font-medium">{p.name}</TableCell>
-                      <TableCell>{p.category ? categoryLabels[p.category] : "-"}</TableCell>
+                      <TableCell>{p.category ? (labelsMap[p.category] || p.category) : "-"}</TableCell>
                       <TableCell>{p.unit || "-"}</TableCell>
                       <TableCell className="text-right">{p.price != null ? p.price.toFixed(2) : "-"}</TableCell>
                       <TableCell className="text-center font-semibold">{qty}</TableCell>
