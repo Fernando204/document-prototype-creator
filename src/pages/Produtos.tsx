@@ -33,9 +33,6 @@ const Produtos = () => {
   const { stock } = useStock();
   const { labelsMap } = useCategories("product");
 
-const Produtos = () => {
-  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
-  const { stock } = useStock();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
