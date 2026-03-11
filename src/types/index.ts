@@ -81,7 +81,7 @@ export interface Client {
 export interface HealthEvent {
   id: string;
   horseIds: string[];
-  type: "vacinação" | "vermifugação" | "ferrageamento" | "veterinário" | "medicamento" | "outro";
+  type: string;
   title: string;
   description?: string;
   date: string;

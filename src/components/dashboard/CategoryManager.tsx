@@ -28,11 +28,13 @@ import { NewCategoryDialog } from "@/components/modals/NewCategoryDialog";
 const groupLabels: Record<string, string> = {
   product: "Produtos/Estoque",
   supplier: "Fornecedores",
+  event: "Eventos",
 };
 
 export function CategoryManager() {
   const productCats = useCategories("product");
   const supplierCats = useCategories("supplier");
+  const eventCats = useCategories("event");
 
   const [activeGroup, setActiveGroup] = useState<string>("product");
   const [newDialogOpen, setNewDialogOpen] = useState(false);
@@ -41,7 +43,8 @@ export function CategoryManager() {
   const [editName, setEditName] = useState("");
   const [editDesc, setEditDesc] = useState("");
 
-  const activeCats = activeGroup === "product" ? productCats : supplierCats;
+  const catsMap: Record<string, typeof productCats> = { product: productCats, supplier: supplierCats, event: eventCats };
+  const activeCats = catsMap[activeGroup] ?? productCats;
 
   const handleAddCategory = (name: string, description?: string): boolean => {
     const result = activeCats.addCategory(name, description);

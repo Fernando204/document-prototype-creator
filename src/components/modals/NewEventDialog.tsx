@@ -12,12 +12,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { HealthEvent, Horse, EventStockItem, StockItem } from "@/types";
 import { toast } from "sonner";
 import { Users, X, CheckSquare } from "lucide-react";
 import { EventStockSelector } from "./EventStockSelector";
+import { CategorySelect } from "@/components/CategorySelect";
 
 interface Colaborador {
   id: string;
@@ -169,23 +169,13 @@ export function NewEventDialog({
           </div>
 
           <div className="space-y-2">
-            <Label>Tipo</Label>
-            <Select
+            <Label>Categoria</Label>
+            <CategorySelect
+              group="event"
               value={formData.type}
-              onValueChange={(v) => setFormData({ ...formData, type: v as HealthEvent["type"] })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="vacinação">Vacinação</SelectItem>
-                <SelectItem value="vermifugação">Vermifugação</SelectItem>
-                <SelectItem value="ferrageamento">Ferrageamento</SelectItem>
-                <SelectItem value="veterinário">Veterinário</SelectItem>
-                <SelectItem value="medicamento">Medicamento</SelectItem>
-                <SelectItem value="outro">Outro</SelectItem>
-              </SelectContent>
-            </Select>
+              onValueChange={(v) => setFormData({ ...formData, type: v })}
+              placeholder="Selecione a categoria"
+            />
           </div>
 
           <div className="space-y-2">

@@ -3,6 +3,7 @@ import { useEvents } from "@/hooks/useEvents";
 import { useHorses } from "@/hooks/useHorses";
 import { useStock } from "@/hooks/useStock";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useCategories } from "@/hooks/useCategories";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +47,7 @@ const Saude = () => {
   const { events, addEvent, completeEvent, deleteEvent } = useEvents();
   const { horses } = useHorses();
   const { stock } = useStock();
+  const { categories: eventCategories, labelsMap: eventLabelsMap } = useCategories("event");
   const [colaboradores] = useLocalStorage<Colaborador[]>("horsecontrol-colaboradores", []);
   const [isNewEventOpen, setIsNewEventOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -98,13 +100,10 @@ const Saude = () => {
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Tipo" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos Tipos</SelectItem>
-              <SelectItem value="vacinação">Vacinação</SelectItem>
-              <SelectItem value="vermifugação">Vermifugação</SelectItem>
-              <SelectItem value="ferrageamento">Ferrageamento</SelectItem>
-              <SelectItem value="veterinário">Veterinário</SelectItem>
-              <SelectItem value="medicamento">Medicamento</SelectItem>
-              <SelectItem value="outro">Outro</SelectItem>
+              <SelectItem value="all">Todas Categorias</SelectItem>
+              {eventCategories.map((cat) => (
+                <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -134,7 +133,7 @@ const Saude = () => {
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {getHorseNames(event.horseIds)} • {event.type}
+                      {getHorseNames(event.horseIds)} • {eventLabelsMap[event.type] || event.type}
                     </p>
                     {event.veterinarian && (
                       <p className="text-xs text-muted-foreground">Veterinário: {event.veterinarian}</p>
