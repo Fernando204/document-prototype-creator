@@ -33,7 +33,7 @@ export interface Supplier {
 const Fornecedores = () => {
   const { labelsMap: typeLabelsMap } = useCategories("supplier");
 
-const Fornecedores = () => {
+  const [suppliers, setSuppliers] = useLocalStorage<Supplier[]>("horsecontrol-suppliers", []);
   const [suppliers, setSuppliers] = useLocalStorage<Supplier[]>("horsecontrol-suppliers", []);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editing, setEditing] = useState<Supplier | null>(null);
