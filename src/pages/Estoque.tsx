@@ -212,9 +212,10 @@ const Estoque = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge className={cn("text-xs", categoryColors[item.category])}>
-                          {categoryLabels[item.category]}
+                        <Badge className={cn("text-xs", "bg-secondary text-secondary-foreground")}>
+                          {labelsMap[item.category] || item.category}
                         </Badge>
+                      </TableCell>
                       </TableCell>
                       <TableCell className="text-center font-semibold">{item.quantity}</TableCell>
                       <TableCell className="text-center">
