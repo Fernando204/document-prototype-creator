@@ -24,9 +24,6 @@ const Estoque = () => {
   const { products } = useProducts();
   const { labelsMap } = useCategories("product");
 
-const Estoque = () => {
-  const { stock, addItem, updateItem, deleteItem, getLowStockItems } = useStock();
-  const { products } = useProducts();
   const [isNewItemOpen, setIsNewItemOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<StockItem | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
