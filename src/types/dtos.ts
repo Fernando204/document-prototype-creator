@@ -1,4 +1,4 @@
-import { Horse, HealthEvent, StockItem, Competition, Reproduction } from "./index";
+import { Horse, HealthEvent, StockItem, Product, Competition, Reproduction } from "./index";
 
 // Horse DTOs
 export type CreateHorseDTO = Omit<Horse, "id" | "createdAt" | "updatedAt" | "age"> & {
