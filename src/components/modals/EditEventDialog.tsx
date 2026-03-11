@@ -18,6 +18,7 @@ import { HealthEvent, Horse, EventStockItem, StockItem } from "@/types";
 import { toast } from "sonner";
 import { Users, X, CheckSquare } from "lucide-react";
 import { EventStockSelector } from "./EventStockSelector";
+import { CategorySelect } from "@/components/CategorySelect";
 
 interface Colaborador {
   id: string;
