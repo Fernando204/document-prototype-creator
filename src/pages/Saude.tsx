@@ -3,6 +3,7 @@ import { useEvents } from "@/hooks/useEvents";
 import { useHorses } from "@/hooks/useHorses";
 import { useStock } from "@/hooks/useStock";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useCategories } from "@/hooks/useCategories";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
