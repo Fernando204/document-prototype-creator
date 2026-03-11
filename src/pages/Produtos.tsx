@@ -28,14 +28,10 @@ import { useProducts } from "@/hooks/useProducts";
 import { useStock } from "@/hooks/useStock";
 import { Product } from "@/types";
 
-const categoryLabels: Record<string, string> = {
-  medicamento: "Medicamento",
-  ração: "Ração",
-  suplemento: "Suplemento",
-  equipamento: "Equipamento",
-  higiene: "Higiene",
-  outro: "Outro",
-};
+const Produtos = () => {
+  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
+  const { stock } = useStock();
+  const { labelsMap } = useCategories("product");
 
 const Produtos = () => {
   const { products, addProduct, updateProduct, deleteProduct } = useProducts();
