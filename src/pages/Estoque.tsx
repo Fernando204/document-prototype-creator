@@ -216,7 +216,6 @@ const Estoque = () => {
                           {labelsMap[item.category] || item.category}
                         </Badge>
                       </TableCell>
-                      </TableCell>
                       <TableCell className="text-center font-semibold">{item.quantity}</TableCell>
                       <TableCell className="text-center">
                         {item.reservedQuantity > 0 ? (
