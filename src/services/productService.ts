@@ -28,7 +28,10 @@ export const productService = {
     return simulateRequest(() => {
       const products = getProducts();
       const newItem: Product = {
-        ...dto,
+        name: dto.name,
+        category: dto.category,
+        unit: dto.unit,
+        price: dto.price,
         id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),

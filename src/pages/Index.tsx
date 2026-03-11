@@ -9,6 +9,7 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 import { HorseFormDialog } from "@/components/modals/HorseFormDialog";
 import { NewEventDialog } from "@/components/modals/NewEventDialog";
 import { ReportDialog } from "@/components/modals/ReportDialog";
+import { CategoryManager } from "@/components/dashboard/CategoryManager";
 import { HorseDetailDialog } from "@/components/modals/HorseDetailDialog";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Competition, Reproduction, Horse } from "@/types";
@@ -160,48 +161,8 @@ const Index = () => {
         {/* Activity Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <RecentActivity activities={activities} />
+          <CategoryManager />
 
-          {/* Financial Summary */}
-          <div className="bg-card rounded-xl shadow-soft p-5 animate-fade-in">
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="h-5 w-5 text-horse-sage" />
-              <h2 className="text-lg font-semibold text-foreground">Resumo Financeiro</h2>
-              <button
-                className="ml-auto text-sm text-primary hover:underline font-medium"
-                onClick={() => navigate("/financeiro")}
-              >
-                Ver detalhes
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-horse-sage-light rounded-lg">
-                <div>
-                  <p className="text-sm font-medium text-foreground">Receita do Mês</p>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}
-                  </p>
-                </div>
-                <p className="text-xl font-bold text-horse-sage">R$ 30.000</p>
-              </div>
-
-              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                <div>
-                  <p className="text-sm font-medium text-foreground">Despesas</p>
-                  <p className="text-xs text-muted-foreground">Medicamentos, ração</p>
-                </div>
-                <p className="text-xl font-bold text-muted-foreground">R$ 5.500</p>
-              </div>
-
-              <div className="flex items-center justify-between p-3 bg-horse-gold-light rounded-lg">
-                <div>
-                  <p className="text-sm font-medium text-foreground">Saldo</p>
-                  <p className="text-xs text-muted-foreground">Resultado do mês</p>
-                </div>
-                <p className="text-xl font-bold text-horse-sage">R$ 24.500</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 

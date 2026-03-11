@@ -14,6 +14,8 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { CategorySelect } from "@/components/CategorySelect";
+import { useCategories } from "@/hooks/useCategories";
 import { Plus, Search, Edit, Trash2, Phone, Mail, Truck, Eye } from "lucide-react";
 import { toast } from "sonner";
 
@@ -28,17 +30,9 @@ export interface Supplier {
   updatedAt: string;
 }
 
-const typeLabels: Record<Supplier["type"], string> = {
-  ração: "Ração",
-  medicamento: "Medicamento",
-  equipamento: "Equipamento",
-  veterinário: "Veterinário",
-  ferreiro: "Ferreiro",
-  transporte: "Transporte",
-  outro: "Outro",
-};
-
 const Fornecedores = () => {
+  const { labelsMap: typeLabelsMap } = useCategories("supplier");
+
   const [suppliers, setSuppliers] = useLocalStorage<Supplier[]>("horsecontrol-suppliers", []);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editing, setEditing] = useState<Supplier | null>(null);
@@ -121,7 +115,7 @@ const Fornecedores = () => {
                 <CardContent className="space-y-2 text-sm text-muted-foreground">
                   {supplier.phone && <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5" /><span>{supplier.phone}</span></div>}
                   {supplier.email && <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5" /><span className="truncate">{supplier.email}</span></div>}
-                  <Badge variant="secondary" className="text-xs">{typeLabels[supplier.type]}</Badge>
+                  <Badge variant="secondary" className="text-xs">{typeLabelsMap[supplier.type] || supplier.type}</Badge>
                 </CardContent>
               </Card>
             ))}
@@ -152,14 +146,12 @@ const Fornecedores = () => {
             </div>
             <div className="space-y-2">
               <Label>Tipo de Serviço/Produto</Label>
-              <Select value={formData.type} onValueChange={(v) => setFormData({ ...formData, type: v as Supplier["type"] })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {Object.entries(typeLabels).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>{label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <CategorySelect
+                group="supplier"
+                value={formData.type}
+                onValueChange={(v) => setFormData({ ...formData, type: v as Supplier["type"] })}
+                placeholder="Selecione"
+              />
             </div>
             <div className="space-y-2">
               <Label>Observações</Label>

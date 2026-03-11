@@ -20,24 +20,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CategorySelect } from "@/components/CategorySelect";
+import { useCategories } from "@/hooks/useCategories";
 import { Plus, Edit2, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useProducts } from "@/hooks/useProducts";
 import { useStock } from "@/hooks/useStock";
 import { Product } from "@/types";
 
-const categoryLabels: Record<string, string> = {
-  medicamento: "Medicamento",
-  ração: "Ração",
-  suplemento: "Suplemento",
-  equipamento: "Equipamento",
-  higiene: "Higiene",
-  outro: "Outro",
-};
-
 const Produtos = () => {
   const { products, addProduct, updateProduct, deleteProduct } = useProducts();
   const { stock } = useStock();
+  const { labelsMap } = useCategories("product");
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -134,7 +129,7 @@ const Produtos = () => {
                   return (
                     <TableRow key={p.id}>
                       <TableCell className="font-medium">{p.name}</TableCell>
-                      <TableCell>{p.category ? categoryLabels[p.category] : "-"}</TableCell>
+                      <TableCell>{p.category ? (labelsMap[p.category] || p.category) : "-"}</TableCell>
                       <TableCell>{p.unit || "-"}</TableCell>
                       <TableCell className="text-right">{p.price != null ? p.price.toFixed(2) : "-"}</TableCell>
                       <TableCell className="text-center font-semibold">{qty}</TableCell>
@@ -174,19 +169,13 @@ const Produtos = () => {
               </div>
               <div className="space-y-2">
                 <Label>Categoria</Label>
-                <Select
+                <CategorySelect
+                  group="product"
                   value={formData.category}
                   onValueChange={(val) => setFormData({ ...formData, category: val as Product["category"] })}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="(nenhuma)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(categoryLabels).map(([key, label]) => (
-                      <SelectItem key={key} value={key}>{label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  placeholder="(nenhuma)"
+                  className="w-full"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="unit">Unidade</Label>

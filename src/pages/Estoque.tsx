@@ -2,6 +2,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import React, { useState } from "react";
 import { useStock } from "@/hooks/useStock";
 import { useProducts } from "@/hooks/useProducts";
+import { useCategories } from "@/hooks/useCategories";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -10,37 +11,19 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
+import { CategorySelect } from "@/components/CategorySelect";
 import { Plus, Search, Package, AlertTriangle, Edit2, Trash2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { StockItem } from "@/types";
 
-const categoryLabels: Record<string, string> = {
-  medicamento: "Medicamento",
-  ração: "Ração",
-  suplemento: "Suplemento",
-  equipamento: "Equipamento",
-  higiene: "Higiene",
-  outro: "Outro",
-};
-
-const categoryColors: Record<string, string> = {
-  medicamento: "bg-destructive/10 text-destructive",
-  ração: "bg-accent/50 text-accent-foreground",
-  suplemento: "bg-primary/10 text-primary",
-  equipamento: "bg-secondary text-secondary-foreground",
-  higiene: "bg-muted text-muted-foreground",
-  outro: "bg-muted text-muted-foreground",
-};
-
 const Estoque = () => {
   const { stock, addItem, updateItem, deleteItem, getLowStockItems } = useStock();
   const { products } = useProducts();
+  const { labelsMap } = useCategories("product");
+
   const [isNewItemOpen, setIsNewItemOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<StockItem | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -185,15 +168,14 @@ const Estoque = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Buscar item..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
           </div>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-full sm:w-[180px]"><SelectValue placeholder="Categoria" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas Categorias</SelectItem>
-              {Object.entries(categoryLabels).map(([key, label]) => (
-                <SelectItem key={key} value={key}>{label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <CategorySelect
+            group="product"
+            value={categoryFilter}
+            onValueChange={setCategoryFilter}
+            placeholder="Categoria"
+            showAll
+            className="w-full sm:w-[180px]"
+          />
         </div>
 
         {/* Stock Table */}
@@ -230,8 +212,8 @@ const Estoque = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge className={cn("text-xs", categoryColors[item.category])}>
-                          {categoryLabels[item.category]}
+                        <Badge className={cn("text-xs", "bg-secondary text-secondary-foreground")}>
+                          {labelsMap[item.category] || item.category}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-center font-semibold">{item.quantity}</TableCell>
@@ -290,14 +272,17 @@ const Estoque = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2 col-span-2">
                 <Label>Produto *</Label>
-                <Select value={formData.productId} onValueChange={(v) => setFormData({ ...formData, productId: v })} disabled={products.length === 0}>
-                  <SelectTrigger className="w-full"><SelectValue placeholder={products.length === 0 ? "Cadastre um produto primeiro" : "Selecione"} /></SelectTrigger>
-                  <SelectContent>
-                    {products.map((p) => (
-                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <select
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  value={formData.productId}
+                  onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
+                  disabled={products.length === 0}
+                >
+                  <option value="">{products.length === 0 ? "Cadastre um produto primeiro" : "Selecione"}</option>
+                  {products.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="unit">Unidade *</Label>
