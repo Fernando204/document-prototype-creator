@@ -34,7 +34,6 @@ const Fornecedores = () => {
   const { labelsMap: typeLabelsMap } = useCategories("supplier");
 
   const [suppliers, setSuppliers] = useLocalStorage<Supplier[]>("horsecontrol-suppliers", []);
-  const [suppliers, setSuppliers] = useLocalStorage<Supplier[]>("horsecontrol-suppliers", []);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editing, setEditing] = useState<Supplier | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
