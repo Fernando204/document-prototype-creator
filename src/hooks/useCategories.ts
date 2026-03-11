@@ -29,6 +29,14 @@ const BUILT_IN: Record<string, { value: string; label: string }[]> = {
     { value: "transporte", label: "Transporte" },
     { value: "outro", label: "Outro" },
   ],
+  event: [
+    { value: "vacinação", label: "Vacinação" },
+    { value: "vermifugação", label: "Vermifugação" },
+    { value: "ferrageamento", label: "Ferrageamento" },
+    { value: "veterinário", label: "Veterinário" },
+    { value: "medicamento", label: "Medicamento" },
+    { value: "outro", label: "Outro" },
+  ],
 };
 
 export function useCategories(group: string) {
