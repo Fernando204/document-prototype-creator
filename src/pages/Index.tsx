@@ -9,6 +9,7 @@ import { QuickActions } from "@/components/dashboard/QuickActions";
 import { HorseFormDialog } from "@/components/modals/HorseFormDialog";
 import { NewEventDialog } from "@/components/modals/NewEventDialog";
 import { ReportDialog } from "@/components/modals/ReportDialog";
+import { CategoryManager } from "@/components/dashboard/CategoryManager";
 import { HorseDetailDialog } from "@/components/modals/HorseDetailDialog";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Competition, Reproduction, Horse } from "@/types";
