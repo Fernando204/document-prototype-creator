@@ -14,6 +14,8 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { CategorySelect } from "@/components/CategorySelect";
+import { useCategories } from "@/hooks/useCategories";
 import { Plus, Search, Edit, Trash2, Phone, Mail, Truck, Eye } from "lucide-react";
 import { toast } from "sonner";
 
