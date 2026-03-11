@@ -161,6 +161,7 @@ const Index = () => {
         {/* Activity Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <RecentActivity activities={activities} />
+          <CategoryManager />
 
           {/* Financial Summary */}
           <div className="bg-card rounded-xl shadow-soft p-5 animate-fade-in">
