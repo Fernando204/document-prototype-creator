@@ -24,7 +24,7 @@ import { CategorySelect } from "@/components/CategorySelect";
 import { useCategories } from "@/hooks/useCategories";
 import { Plus, Edit2, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useStock } from "@/hooks/useStock";
+import { useProducts } from "@/hooks/useProducts";
 import { Product } from "@/types";
 
 const categoryLabels: Record<string, string> = {
