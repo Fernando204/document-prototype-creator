@@ -133,7 +133,7 @@ const Saude = () => {
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {getHorseNames(event.horseIds)} • {event.type}
+                      {getHorseNames(event.horseIds)} • {eventLabelsMap[event.type] || event.type}
                     </p>
                     {event.veterinarian && (
                       <p className="text-xs text-muted-foreground">Veterinário: {event.veterinarian}</p>
